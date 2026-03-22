@@ -3,7 +3,7 @@ import SwiftData
 import PhotosUI
 import UIKit
 
-struct AddPlanView: View {
+struct AddscheduleView: View {
     @Environment(\.modelContext) private var context
     @Binding var showAddSheet: Bool
 
@@ -136,6 +136,15 @@ struct AddPlanView: View {
 
             Button {
                 addPlan()
+//                let repository = FirebasePlanRepository()
+//
+//                repository.addPlan(title: title, note: note) { error in
+//                    if let error {
+//                        print("保存失敗: \(error.localizedDescription)")
+//                    } else {
+//                        print("保存成功")
+//                    }
+//                }
             } label: {
                 Text("保存")
                     .font(.headline)
@@ -168,7 +177,7 @@ struct AddPlanView: View {
     }
 
     func addPlan() {
-        let newPlan = Plan(
+        let newPlan = schedule(
             title: title,
             note: note,
             timedata: timedata,
@@ -192,6 +201,6 @@ struct AddPlanView: View {
 }
 
 #Preview {
-    AddPlanView(showAddSheet: .constant(true))
-        .modelContainer(for: [Plan.self, DateCandidate.self, PlaceCandidate.self])
+    AddscheduleView(showAddSheet: .constant(true))
+        .modelContainer(for: [schedule.self, DateCandidate.self, PlaceCandidate.self])
 }

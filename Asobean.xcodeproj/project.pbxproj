@@ -6,8 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6F7A1A802F6E0BC600CFAF85 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6F7A1A7F2F6E0BC600CFAF85 /* FirebaseCore */; };
+		6F7A1A872F6E10F100CFAF85 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6F7A1A862F6E10F100CFAF85 /* FirebaseStorage */; };
+		6F7A1A892F6E12D000CFAF85 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6F7A1A882F6E12D000CFAF85 /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
-		6F7A1A212F6AA04700CFAF85 /* Asobea.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asobea.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F7A1A212F6AA04700CFAF85 /* Asobean.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asobean.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F7A1A7C2F6E09C500CFAF85 /* Asobean-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Asobean-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -23,6 +30,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F7A1A802F6E0BC600CFAF85 /* FirebaseCore in Frameworks */,
+				6F7A1A872F6E10F100CFAF85 /* FirebaseStorage in Frameworks */,
+				6F7A1A892F6E12D000CFAF85 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -32,7 +42,9 @@
 		6F7A1A182F6AA04700CFAF85 = {
 			isa = PBXGroup;
 			children = (
+				6F7A1A7C2F6E09C500CFAF85 /* Asobean-Info.plist */,
 				6F7A1A232F6AA04700CFAF85 /* Asobee */,
+				6F7A1A7E2F6E0BC600CFAF85 /* Frameworks */,
 				6F7A1A222F6AA04700CFAF85 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,17 +52,24 @@
 		6F7A1A222F6AA04700CFAF85 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6F7A1A212F6AA04700CFAF85 /* Asobea.app */,
+				6F7A1A212F6AA04700CFAF85 /* Asobean.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		6F7A1A7E2F6E0BC600CFAF85 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6F7A1A202F6AA04700CFAF85 /* Asobea */ = {
+		6F7A1A202F6AA04700CFAF85 /* Asobean */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6F7A1A2C2F6AA04800CFAF85 /* Build configuration list for PBXNativeTarget "Asobea" */;
+			buildConfigurationList = 6F7A1A2C2F6AA04800CFAF85 /* Build configuration list for PBXNativeTarget "Asobean" */;
 			buildPhases = (
 				6F7A1A1D2F6AA04700CFAF85 /* Sources */,
 				6F7A1A1E2F6AA04700CFAF85 /* Frameworks */,
@@ -63,11 +82,14 @@
 			fileSystemSynchronizedGroups = (
 				6F7A1A232F6AA04700CFAF85 /* Asobee */,
 			);
-			name = Asobea;
+			name = Asobean;
 			packageProductDependencies = (
+				6F7A1A7F2F6E0BC600CFAF85 /* FirebaseCore */,
+				6F7A1A862F6E10F100CFAF85 /* FirebaseStorage */,
+				6F7A1A882F6E12D000CFAF85 /* FirebaseFirestore */,
 			);
 			productName = Asobee;
-			productReference = 6F7A1A212F6AA04700CFAF85 /* Asobea.app */;
+			productReference = 6F7A1A212F6AA04700CFAF85 /* Asobean.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +107,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 6F7A1A1C2F6AA04700CFAF85 /* Build configuration list for PBXProject "Asobea" */;
+			buildConfigurationList = 6F7A1A1C2F6AA04700CFAF85 /* Build configuration list for PBXProject "Asobean" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -94,12 +116,15 @@
 			);
 			mainGroup = 6F7A1A182F6AA04700CFAF85;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6F7A1A7B2F6E001200CFAF85 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6F7A1A222F6AA04700CFAF85 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6F7A1A202F6AA04700CFAF85 /* Asobea */,
+				6F7A1A202F6AA04700CFAF85 /* Asobean */,
 			);
 		};
 /* End PBXProject section */
@@ -256,6 +281,7 @@
 				DEVELOPMENT_TEAM = KGUWL47KG5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Asobean-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -288,6 +314,7 @@
 				DEVELOPMENT_TEAM = KGUWL47KG5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Asobean-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -313,7 +340,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6F7A1A1C2F6AA04700CFAF85 /* Build configuration list for PBXProject "Asobea" */ = {
+		6F7A1A1C2F6AA04700CFAF85 /* Build configuration list for PBXProject "Asobean" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6F7A1A2A2F6AA04800CFAF85 /* Debug */,
@@ -322,7 +349,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6F7A1A2C2F6AA04800CFAF85 /* Build configuration list for PBXNativeTarget "Asobea" */ = {
+		6F7A1A2C2F6AA04800CFAF85 /* Build configuration list for PBXNativeTarget "Asobean" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6F7A1A2D2F6AA04800CFAF85 /* Debug */,
@@ -332,6 +359,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6F7A1A7B2F6E001200CFAF85 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.11.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6F7A1A7F2F6E0BC600CFAF85 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6F7A1A7B2F6E001200CFAF85 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		6F7A1A862F6E10F100CFAF85 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6F7A1A7B2F6E001200CFAF85 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		6F7A1A882F6E12D000CFAF85 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6F7A1A7B2F6E001200CFAF85 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6F7A1A192F6AA04700CFAF85 /* Project object */;
 }
