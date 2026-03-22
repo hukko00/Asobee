@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyBxLm--l5UD2gLfgCrpjw6Hq0Hq72WrYkg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1032387912887</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>app.Suzuki.Masa.Asobee</string>
+	<key>PROJECT_ID</key>
+	<string>asobean-af0cc</string>
+	<key>STORAGE_BUCKET</key>
+	<string>asobean-af0cc.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1032387912887:ios:78642021ddf558c6345932</string>
+</dict>
+</plist>

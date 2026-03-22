@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		6F7A1A212F6AA04700CFAF85 /* Asobee.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asobee.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F7A1A212F6AA04700CFAF85 /* Asobea.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asobea.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -40,7 +40,7 @@
 		6F7A1A222F6AA04700CFAF85 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6F7A1A212F6AA04700CFAF85 /* Asobee.app */,
+				6F7A1A212F6AA04700CFAF85 /* Asobea.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6F7A1A202F6AA04700CFAF85 /* Asobee */ = {
+		6F7A1A202F6AA04700CFAF85 /* Asobea */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6F7A1A2C2F6AA04800CFAF85 /* Build configuration list for PBXNativeTarget "Asobee" */;
+			buildConfigurationList = 6F7A1A2C2F6AA04800CFAF85 /* Build configuration list for PBXNativeTarget "Asobea" */;
 			buildPhases = (
 				6F7A1A1D2F6AA04700CFAF85 /* Sources */,
 				6F7A1A1E2F6AA04700CFAF85 /* Frameworks */,
@@ -63,11 +63,11 @@
 			fileSystemSynchronizedGroups = (
 				6F7A1A232F6AA04700CFAF85 /* Asobee */,
 			);
-			name = Asobee;
+			name = Asobea;
 			packageProductDependencies = (
 			);
 			productName = Asobee;
-			productReference = 6F7A1A212F6AA04700CFAF85 /* Asobee.app */;
+			productReference = 6F7A1A212F6AA04700CFAF85 /* Asobea.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 6F7A1A1C2F6AA04700CFAF85 /* Build configuration list for PBXProject "Asobee" */;
+			buildConfigurationList = 6F7A1A1C2F6AA04700CFAF85 /* Build configuration list for PBXProject "Asobea" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6F7A1A202F6AA04700CFAF85 /* Asobee */,
+				6F7A1A202F6AA04700CFAF85 /* Asobea */,
 			);
 		};
 /* End PBXProject section */
@@ -313,7 +313,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6F7A1A1C2F6AA04700CFAF85 /* Build configuration list for PBXProject "Asobee" */ = {
+		6F7A1A1C2F6AA04700CFAF85 /* Build configuration list for PBXProject "Asobea" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6F7A1A2A2F6AA04800CFAF85 /* Debug */,
@@ -322,7 +322,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6F7A1A2C2F6AA04800CFAF85 /* Build configuration list for PBXNativeTarget "Asobee" */ = {
+		6F7A1A2C2F6AA04800CFAF85 /* Build configuration list for PBXNativeTarget "Asobea" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6F7A1A2D2F6AA04800CFAF85 /* Debug */,
