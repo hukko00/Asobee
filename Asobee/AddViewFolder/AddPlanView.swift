@@ -3,32 +3,29 @@ import SwiftData
 import PhotosUI
 import UIKit
 
-struct AddscheduleView: View {
+struct AddPlanView: View {
     @Environment(\.modelContext) private var context
-    @Binding var showAddSheet: Bool
+    @Binding var showAddplanSheet: Bool
 
-    @State private var title = ""
-    @State private var note = ""
-    @State private var timedata = Date()
-    @State private var imageData: Data?
-    @State private var linkData: URL?
-
-    @State private var showPhotoPicker = false
-    @State private var selectedPhotoItem: PhotosPickerItem?
-    @State private var selectedImageData: Data?
-
+    @State private var plantitle = ""
+    @State private var planimageData: Data? = nil
+    @State private var plancolor = 1
+    @State private var planDate = Date()
+    @State private var selectedItem: PhotosPickerItem? = nil
+    
     private var canSave: Bool {
-        !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !plantitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
+            
             VStack(alignment: .leading, spacing: 8) {
                 Text("タイトル")
                     .font(.title3)
                     .foregroundColor(.black)
 
-                TextField("タイトル", text: $title)
+                TextField("タイトル", text: $plantitle)
                     .padding(12)
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 14))
@@ -38,35 +35,8 @@ struct AddscheduleView: View {
                     )
             }
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("内容")
-                    .font(.title3)
-                    .foregroundColor(.black)
-
-                TextEditor(text: $note)
-                    .frame(height: 80)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 10)
-                    .scrollContentBackground(.hidden)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .overlay(alignment: .topLeading) {
-                        if note.isEmpty {
-                            Text("予定の内容を入力")
-                                .foregroundStyle(.gray)
-                                .padding(.top, 18)
-                                .padding(.leading, 14)
-                                .allowsHitTesting(false)
-                        }
-                    }
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                    )
-            }
-
-            if let selectedImageData,
-               let uiImage = UIImage(data: selectedImageData) {
+            if let data = planimageData,
+               let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFit()
@@ -79,14 +49,16 @@ struct AddscheduleView: View {
             }
 
             HStack(alignment: .bottom, spacing: 12) {
+                
+                // 日付
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("日時")
+                    Text("日にち")
                         .font(.headline)
 
                     DatePicker(
                         "",
-                        selection: $timedata,
-                        displayedComponents: [.date, .hourAndMinute]
+                        selection: $planDate,
+                        displayedComponents: [.date]
                     )
                     .labelsHidden()
                     .padding(12)
@@ -100,13 +72,15 @@ struct AddscheduleView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 HStack(spacing: 12) {
-                    Button {
-                        showPhotoPicker = true
-                    } label: {
+                    PhotosPicker(
+                        selection: $selectedItem,
+                        matching: .images
+                    ) {
+                        
                         Image(systemName: "photo")
-                            .font(.system(size: 24))
+                            .font(.system(size: 40))
                             .foregroundStyle(.black)
-                            .frame(width: 44, height: 44)
+                            .frame(width: 52, height: 52)
                             .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                             .overlay(
@@ -115,14 +89,27 @@ struct AddscheduleView: View {
                             )
                     }
                     .buttonStyle(.plain)
+                    .onChange(of: selectedItem) { _, newItem in
+                        Task {
+                            if let data = try? await newItem?.loadTransferable(type: Data.self) {
+                                // Optionally validate it's an image by attempting to init UIImage
+                                if UIImage(data: data) != nil {
+                                    await MainActor.run {
+                                        self.planimageData = data
+                                    }
+                                }
+                            }
+                        }
+                    }
 
+                    // フレンドボタン（仮）
                     Button {
-                        print("url ok")
+                        print("friendOK")
                     } label: {
-                        Image(systemName: "link")
-                            .font(.system(size: 24))
+                        Image(systemName: "person.2")
+                            .font(.system(size: 37))
                             .foregroundStyle(.black)
-                            .frame(width: 44, height: 44)
+                            .frame(width: 52, height: 52)
                             .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                             .overlay(
@@ -134,17 +121,9 @@ struct AddscheduleView: View {
                 }
             }
 
+            // 保存ボタン
             Button {
                 addPlan()
-//                let repository = FirebasePlanRepository()
-//
-//                repository.addPlan(title: title, note: note) { error in
-//                    if let error {
-//                        print("保存失敗: \(error.localizedDescription)")
-//                    } else {
-//                        print("保存成功")
-//                    }
-//                }
             } label: {
                 Text("保存")
                     .font(.headline)
@@ -160,39 +139,22 @@ struct AddscheduleView: View {
         .background(Color(red: 255/255, green: 255/255, blue: 249/255))
         .clipShape(RoundedRectangle(cornerRadius: 28))
         .shadow(color: .black.opacity(0.15), radius: 12, x: 0, y: 6)
-        .photosPicker(
-            isPresented: $showPhotoPicker,
-            selection: $selectedPhotoItem,
-            matching: .images
-        )
-        .onChange(of: selectedPhotoItem) { _, newItem in
-            Task {
-                guard let newItem else { return }
-
-                if let data = try? await newItem.loadTransferable(type: Data.self) {
-                    selectedImageData = data
-                }
-            }
-        }
     }
 
     func addPlan() {
-        let newPlan = schedule(
-            title: title,
-            note: note,
-            timedata: timedata,
-            imageData: imageData,
-            linkData: linkData,
-            dateCandidates: [],
-            placeCandidates: []
+        let newPlan = Plan(
+            plantitle: plantitle,
+            planimageData: planimageData ?? Data(),
+            planColor: plancolor,
+            planDate: planDate
         )
-
+        
         context.insert(newPlan)
-
+        
         do {
             try context.save()
             withAnimation(.easeInOut) {
-                showAddSheet = false
+                showAddplanSheet = false
             }
         } catch {
             print("保存エラー: \(error)")
@@ -201,6 +163,7 @@ struct AddscheduleView: View {
 }
 
 #Preview {
-    AddscheduleView(showAddSheet: .constant(true))
-        .modelContainer(for: [schedule.self, DateCandidate.self, PlaceCandidate.self])
+    AddPlanView(showAddplanSheet: .constant(true))
+        .modelContainer(for: [Schedule.self, DateCandidate.self, PlaceCandidate.self])
 }
+

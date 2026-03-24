@@ -8,24 +8,22 @@
 import SwiftUI
 
 struct FriendView: View {
+    @State private var showRoot = false
+    
     var body: some View {
-        Text("friendView")
-        Button{
-            let repository = FirebasePlanRepository()
-
-            repository.fetchPlans { plans, error in
-                if let error {
-                    print("取得失敗: \(error.localizedDescription)")
-                } else if let plans {
-                    print("取得成功: \(plans.count)件")
-                    for plan in plans {
-                        print("title: \(plan.title), note: \(plan.note)")
-                    }
-                }
-            }
-        } label:{
-            Text("aaaaaaa")
-                .font(.largeTitle)
+        Button {
+            showRoot = true
+        } label: {
+            Text("ログイン・新規登録")
+                .font(Font.title2.bold())
+                .foregroundStyle(Color.white)
+                .padding()
+                .background(.blue)
+                .clipShape(Capsule())
+        }
+        .sheet(isPresented: $showRoot) {
+            RootView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }

@@ -3,16 +3,22 @@ import SwiftData
 
 struct PlanView: View {
     @State private var showAddplanSheet = false
-    @Query private var plans: [Plan]
+    @Query(sort: [
+        SortDescriptor(\Plan.planDate),
+        SortDescriptor(\Plan.plantitle)
+    ])private var plans: [Plan]
     @Environment(\.modelContext) private var context
-    
+
+    @State private var isShowAlertPlan = false
+    @State private var planToDelete: Plan?
+
     var body: some View {
         ZStack {
             NavigationStack {
                 ZStack {
                     Color(.white)
                         .ignoresSafeArea()
-                    
+
                     if plans.isEmpty {
                         ContentUnavailableView(
                             "プランがありません",
@@ -21,22 +27,28 @@ struct PlanView: View {
                     } else {
                         List {
                             ForEach(plans) { plan in
-                                Button{
-                                    print("button ok")
-                                } label:{
+                                NavigationLink {
+                                    ScheduleView()
+                                } label: {
                                     VStack(alignment: .leading, spacing: 8) {
-                                        HStack{
+                                        HStack {
                                             Text("")
                                                 .padding(10)
-                                            VStack{
+
+                                            VStack {
                                                 Text(plan.plantitle)
-                                                    .font(.system(size: CGFloat(StringSizeselect(String: plan.plantitle))))
+                                                    .font(.system(size: CGFloat(stringSizeSelect(plan.plantitle))))
                                                     .bold()
                                                     .padding(10)
+                                                    .foregroundStyle(.black)
+
                                                 Text(formatDate(date: plan.planDate))
                                                     .font(.system(size: 15))
+                                                    .foregroundStyle(.black)
                                             }
+
                                             Spacer()
+
                                             if let uiImage = UIImage(data: plan.planimageData) {
                                                 Image(uiImage: uiImage)
                                                     .resizable()
@@ -56,9 +68,10 @@ struct PlanView: View {
                                     }
                                 }
                                 .buttonStyle(.plain)
-                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     Button("削除", role: .destructive) {
-                                        deletePlan(plan)
+                                        planToDelete = plan
+                                        isShowAlertPlan = true
                                     }
                                     .tint(.red)
                                 }
@@ -67,35 +80,52 @@ struct PlanView: View {
                         .scrollContentBackground(.hidden)
                         .background(Color.clear)
                     }
+                    VStack {
+                        Spacer()
+
+                        Button {
+                            withAnimation(.easeInOut) {
+                                showAddplanSheet = true
+                            }
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 22, weight: .bold))
+
+                                Text("プランを追加")
+                                    .font(.headline)
+                                    .bold()
+                            }
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Color.blue)
+                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 24)
+                    }
                 }
             }
-            
-            VStack {
-                Spacer()
-                
-                Button {
-                    withAnimation(.easeInOut) {
-                        showAddplanSheet = true
-                    }
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 22, weight: .bold))
-                        
-                        Text("プランを追加")
-                            .font(.headline)
-                            .bold()
-                    }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 18))
+            .alert("プランを削除しますか？", isPresented: $isShowAlertPlan) {
+                Button("キャンセル", role: .cancel) {
+                    planToDelete = nil
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 24)
+
+                Button("削除", role: .destructive) {
+                    if let plan = planToDelete {
+                        deletePlan(plan)
+                    }
+                    planToDelete = nil
+                }
+            } message: {
+                if let plan = planToDelete {
+                    Text("「\(plan.plantitle)」を削除します。")
+                } else {
+                    Text("このプランを削除します。")
+                }
             }
-            
+
             if showAddplanSheet {
                 Color.black.opacity(0.15)
                     .ignoresSafeArea()
@@ -104,10 +134,10 @@ struct PlanView: View {
                             showAddplanSheet = false
                         }
                     }
-                
+
                 VStack {
                     Spacer()
-                    
+
                     AddPlanView(showAddplanSheet: $showAddplanSheet)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .padding(.horizontal, 16)
@@ -116,36 +146,35 @@ struct PlanView: View {
             }
         }
     }
-    func formatDate(date: Date) -> String {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy年MM月dd日" // 希望のフォーマット
-            formatter.locale = Locale(identifier: "ja_JP") // 日本語設定
-            return formatter.string(from: date)
-    }
-    
-    func StringSizeselect(String: String) -> Int{
-        @State var count = String.count
-        if count == 1{
-            return 40
-        }else if count == 2{
-            return 40
-        } else{
-            return 140/count
-        }
-    }
-    
-    private func deletePlan(_ plan: Plan) {
-            context.delete(plan)
 
-            do {
-                try context.save()
-                print("削除成功")
-            } catch {
-                print("削除失敗: \(error.localizedDescription)")
-            }
+    func formatDate(date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy年MM月dd日"
+        formatter.locale = Locale(identifier: "ja_JP")
+        return formatter.string(from: date)
+    }
+
+    func stringSizeSelect(_ text: String) -> Int {
+        let count = text.count
+        if count <= 2 {
+            return 40
+        } else {
+            return 80 / count
         }
+    }
+
+    private func deletePlan(_ plan: Plan) {
+        context.delete(plan)
+
+        do {
+            try context.save()
+            print("削除成功")
+        } catch {
+            print("削除失敗: \(error.localizedDescription)")
+        }
+    }
 }
-#Preview{
+
+#Preview {
     PlanView()
 }
-

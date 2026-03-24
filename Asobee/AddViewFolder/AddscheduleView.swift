@@ -3,20 +3,22 @@ import SwiftData
 import PhotosUI
 import UIKit
 
-struct AddPlanView: View {
+struct AddscheduleView: View {
     @Environment(\.modelContext) private var context
-    @Binding var showAddplanSheet: Bool
+    @Binding var showAddSheet: Bool
 
-    @State private var plantitle = ""
-    @State private var planimageData = Data()
-    @State private var plancolor = 1
-    @State private var planDate = Date()
+    @State private var title = ""
+    @State private var note = ""
+    @State private var timedata = Date()
+    @State private var imageData: Data?
+    @State private var linkData: URL?
+
     @State private var showPhotoPicker = false
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var selectedImageData: Data?
-    
+
     private var canSave: Bool {
-        !plantitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     var body: some View {
@@ -26,7 +28,7 @@ struct AddPlanView: View {
                     .font(.title3)
                     .foregroundColor(.black)
 
-                TextField("タイトル", text: $plantitle)
+                TextField("タイトル", text: $title)
                     .padding(12)
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 14))
@@ -35,6 +37,34 @@ struct AddPlanView: View {
                             .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                     )
             }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("内容")
+                    .font(.title3)
+                    .foregroundColor(.black)
+
+                TextEditor(text: $note)
+                    .frame(height: 80)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 10)
+                    .scrollContentBackground(.hidden)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .overlay(alignment: .topLeading) {
+                        if note.isEmpty {
+                            Text("予定の内容を入力")
+                                .foregroundStyle(.gray)
+                                .padding(.top, 18)
+                                .padding(.leading, 14)
+                                .allowsHitTesting(false)
+                        }
+                    }
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                    )
+            }
+
             if let selectedImageData,
                let uiImage = UIImage(data: selectedImageData) {
                 Image(uiImage: uiImage)
@@ -47,15 +77,16 @@ struct AddPlanView: View {
                             .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                     )
             }
+
             HStack(alignment: .bottom, spacing: 12) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("日にち")
+                    Text("日時")
                         .font(.headline)
 
                     DatePicker(
                         "",
-                        selection: $planDate,
-                        displayedComponents: [.date]
+                        selection: $timedata,
+                        displayedComponents: [.date, .hourAndMinute]
                     )
                     .labelsHidden()
                     .padding(12)
@@ -73,9 +104,9 @@ struct AddPlanView: View {
                         showPhotoPicker = true
                     } label: {
                         Image(systemName: "photo")
-                            .font(.system(size: 40))
+                            .font(.system(size: 24))
                             .foregroundStyle(.black)
-                            .frame(width: 52, height: 52)
+                            .frame(width: 44, height: 44)
                             .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                             .overlay(
@@ -84,13 +115,14 @@ struct AddPlanView: View {
                             )
                     }
                     .buttonStyle(.plain)
+
                     Button {
-                        print("friendOK")
+                        print("url ok")
                     } label: {
-                        Image(systemName: "person.2")
-                            .font(.system(size: 37))
+                        Image(systemName: "link")
+                            .font(.system(size: 24))
                             .foregroundStyle(.black)
-                            .frame(width: 52, height: 52)
+                            .frame(width: 44, height: 44)
                             .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                             .overlay(
@@ -103,7 +135,7 @@ struct AddPlanView: View {
             }
 
             Button {
-                addPlan()
+                addSchedule()
 //                let repository = FirebasePlanRepository()
 //
 //                repository.addPlan(title: title, note: note) { error in
@@ -144,29 +176,31 @@ struct AddPlanView: View {
         }
     }
 
-    func addPlan() {
-        let newPlan = Plan(
-            plantitle: plantitle,
-            planimageData: planimageData,
-            planColor: plancolor,
-            planDate: planDate
+    func addSchedule() {
+        let newPlan = Schedule(
+            title: title,
+            note: note,
+            timedata: timedata,
+            imageData: imageData,
+            linkData: linkData,
+            dateCandidates: [],
+            placeCandidates: []
         )
-        
+
         context.insert(newPlan)
-        
+
         do {
             try context.save()
             withAnimation(.easeInOut) {
-                showAddplanSheet = false
+                showAddSheet = false
             }
         } catch {
             print("保存エラー: \(error)")
         }
     }
-
 }
 
 #Preview {
-    AddPlanView(showAddplanSheet: .constant(true))
-        .modelContainer(for: [schedule.self, DateCandidate.self, PlaceCandidate.self])
+    AddscheduleView(showAddSheet: .constant(true))
+        .modelContainer(for: [Schedule.self, DateCandidate.self, PlaceCandidate.self])
 }

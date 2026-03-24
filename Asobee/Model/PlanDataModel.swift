@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class schedule {
+final class Schedule {
     var title: String
     var note: String
     var timedata: Date
@@ -35,11 +35,13 @@ final class Plan {
     var planimageData: Data
     var planColor: Int
     var planDate: Date
-    init(plantitle: String, planimageData: Data, planColor: Int, planDate: Date) {
+    var schedule: [Schedule] = []
+    init(plantitle: String, planimageData: Data, planColor: Int, planDate: Date,schedule: [Schedule] = []) {
         self.plantitle = plantitle
         self.planimageData = planimageData
         self.planColor = planColor
         self.planDate = planDate
+        self.schedule = schedule
     }
 }
 @Model
