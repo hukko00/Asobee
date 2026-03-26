@@ -2,85 +2,76 @@ import SwiftUI
 import SwiftData
 
 struct ScheduleView: View {
+    var plan:Plan
     @State private var showAddscheduleSheet = false
-    @Query(sort: \Schedule.timedata)
-    private var schedules: [Schedule]
     @Environment(\.modelContext) private var context
-
+    
     @State private var isShowAlertSchedule = false
     @State private var scheduleToDelete: Schedule?
-
+    
     var body: some View {
         ZStack {
             NavigationStack {
                 ZStack {
                     Color(.white)
                         .ignoresSafeArea()
-
-                    if schedules.isEmpty {
-                        ContentUnavailableView(
-                            "スケジュールがありません",
-                            systemImage: "calendar"
-                        )
-                    } else {
-                        List {
-                            ForEach(schedules) { schedule in
-                                HStack{
-                                    VStack{
-                                        Text(DayformatDate(date: schedule.timedata))
-                                            .font(.title)
-                                            .padding(.horizontal,16)
-                                        Text(TimeformatDate(date: schedule.timedata))
-                                            .font(.title2)
-                                    }
-                                    VStack(alignment: .leading, spacing: 4){
-                                        Text(schedule.title)
-                                            .font(.largeTitle)
-                                        Text(schedule.note)
-                                            .font(.title)
-                                    }
+                    List {
+                        ForEach(plan.schedule.sorted(by: { $0.timedata < $1.timedata })) { schedule in
+                            HStack{
+                                VStack{
+                                    Text(DayformatDate(date: schedule.timedata))
+                                        .font(.title)
+                                        .padding(.horizontal,16)
+                                    Text(TimeformatDate(date: schedule.timedata))
+                                        .font(.title2)
                                 }
-                                .padding(4)
-                                .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
-                                .background(Color(red: 242/255, green: 242/255, blue: 247/255))
-                                .cornerRadius(15)
+                                VStack(alignment: .leading, spacing: 4){
+                                    Text(schedule.title)
+                                        .font(.largeTitle)
+                                    Text(schedule.note)
+                                        .font(.title)
+                                }
                             }
+                            .padding(4)
+                            .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
+                            .background(Color(red: 253/255, green: 239/255, blue: 242/255))
+                            .cornerRadius(15)
                         }
-                        .scrollContentBackground(.hidden)
-                        .background(Color.clear)
                     }
-                    VStack {
-                        Spacer()
-
-                        Button {
-                            withAnimation(.easeInOut) {
-                                showAddscheduleSheet = true
-                            }
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: "plus")
-                                    .font(.system(size: 22, weight: .bold))
-
-                                Text("プランを追加")
-                                    .font(.headline)
-                                    .bold()
-                            }
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(Color.blue)
-                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
+                }
+                VStack {
+                    Spacer()
+                    
+                    Button {
+                        withAnimation(.easeInOut) {
+                            showAddscheduleSheet = true
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 24)
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 22, weight: .bold))
+                            
+                            Text("スケジュールを追加")
+                                .font(.headline)
+                                .bold()
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color.blue)
+                        .clipShape(RoundedRectangle(cornerRadius: 18))
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 24)
                 }
             }
             .alert("プランを削除しますか？", isPresented: $isShowAlertSchedule) {
                 Button("キャンセル", role: .cancel) {
                     scheduleToDelete = nil
                 }
-
+                
                 Button("削除", role: .destructive) {
                     if let schedule = scheduleToDelete {
                         deleteSchedule(schedule)
@@ -94,7 +85,7 @@ struct ScheduleView: View {
                     Text("このプランを削除します。")
                 }
             }
-
+            
             if showAddscheduleSheet {
                 Color.black.opacity(0.15)
                     .ignoresSafeArea()
@@ -103,11 +94,14 @@ struct ScheduleView: View {
                             showAddscheduleSheet = false
                         }
                     }
-
+                
                 VStack {
                     Spacer()
-
-                    AddscheduleView(showAddSheet: $showAddscheduleSheet)
+                    
+                    AddscheduleView(
+                        showAddSheet: $showAddscheduleSheet,
+                        plan: plan
+                    )
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .padding(.horizontal, 16)
                         .padding(.bottom, 12)
@@ -115,7 +109,7 @@ struct ScheduleView: View {
             }
         }
     }
-
+    
     func DayformatDate(date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd日"
@@ -136,10 +130,10 @@ struct ScheduleView: View {
             return 80 / count
         }
     }
-
+    
     private func deleteSchedule(_ schedule: Schedule) {
         context.delete(schedule)
-
+        
         do {
             try context.save()
             print("削除成功")
@@ -150,33 +144,12 @@ struct ScheduleView: View {
 }
 
 #Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: Schedule.self, configurations: config)
-    let sample1 = Schedule(
-        title: "映画",
-        note: "友達と行く",
-        timedata: Date().addingTimeInterval(90000)
+    let plan = Plan(
+        plantitle: "サンプル",
+        planimageData: Data(),
+        planColor: 0,
+        planDate: .now
     )
-    let sample2 = Schedule(
-        title: "ゲーセン",
-        note: "18時まで",
-        timedata: Date().addingTimeInterval(86400)
-    )
-    let sample3 = Schedule(
-        title: "駅",
-        note: "名古屋方面",
-        timedata: Date().addingTimeInterval(172800)
-    )
-    let sample4 = Schedule(
-        title: "帰宅",
-        note: "愛知",
-        timedata: Date().addingTimeInterval(180000)
-    )
-    container.mainContext.insert(sample1)
-    container.mainContext.insert(sample2)
-    container.mainContext.insert(sample3)
-    container.mainContext.insert(sample4)
 
-    return ScheduleView()
-        .modelContainer(container)
+    ScheduleView(plan: plan)
 }

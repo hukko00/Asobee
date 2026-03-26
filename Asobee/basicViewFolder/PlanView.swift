@@ -8,7 +8,6 @@ struct PlanView: View {
         SortDescriptor(\Plan.plantitle)
     ])private var plans: [Plan]
     @Environment(\.modelContext) private var context
-
     @State private var isShowAlertPlan = false
     @State private var planToDelete: Plan?
 
@@ -28,7 +27,7 @@ struct PlanView: View {
                         List {
                             ForEach(plans) { plan in
                                 NavigationLink {
-                                    ScheduleView()
+                                    ScheduleView(plan: plan)
                                 } label: {
                                     VStack(alignment: .leading, spacing: 8) {
                                         HStack {

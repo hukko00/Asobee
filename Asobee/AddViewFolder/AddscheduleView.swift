@@ -6,7 +6,7 @@ import UIKit
 struct AddscheduleView: View {
     @Environment(\.modelContext) private var context
     @Binding var showAddSheet: Bool
-
+    var plan:Plan
     @State private var title = ""
     @State private var note = ""
     @State private var timedata = Date()
@@ -177,17 +177,20 @@ struct AddscheduleView: View {
     }
 
     func addSchedule() {
-        let newPlan = Schedule(
+        let newSchedule = Schedule(
             title: title,
             note: note,
             timedata: timedata,
-            imageData: imageData,
+            imageData: selectedImageData,
             linkData: linkData,
             dateCandidates: [],
-            placeCandidates: []
+            placeCandidates: [],
+            plan: plan
         )
+        
+        context.insert(newSchedule)
 
-        context.insert(newPlan)
+        plan.schedule.append(newSchedule)  
 
         do {
             try context.save()
@@ -201,6 +204,21 @@ struct AddscheduleView: View {
 }
 
 #Preview {
-    AddscheduleView(showAddSheet: .constant(true))
-        .modelContainer(for: [Schedule.self, DateCandidate.self, PlaceCandidate.self])
+    let plan = Plan(
+        plantitle: "サンプル",
+        planimageData: Data(),
+        planColor: 0,
+        planDate: .now
+    )
+
+    AddscheduleView(
+        showAddSheet: .constant(true),
+        plan: plan  
+    )
+    .modelContainer(for: [
+        Plan.self,
+        Schedule.self,
+        DateCandidate.self,
+        PlaceCandidate.self
+    ])
 }

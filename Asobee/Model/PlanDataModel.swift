@@ -7,18 +7,19 @@ final class Schedule {
     var note: String
     var timedata: Date
     var imageData: Data?
-    var linkData:URL?
+    var linkData: URL?
     var dateCandidates: [DateCandidate]
     var placeCandidates: [PlaceCandidate]
-
+    var plan: Plan
     init(
         title: String,
         note: String = "",
         timedata: Date = .now,
-        imageData:Data? = nil,
-        linkData:URL? = nil,
+        imageData: Data? = nil,
+        linkData: URL? = nil,
         dateCandidates: [DateCandidate] = [],
-        placeCandidates: [PlaceCandidate] = []
+        placeCandidates: [PlaceCandidate] = [],
+        plan: Plan
     ) {
         self.title = title
         self.note = note
@@ -27,6 +28,7 @@ final class Schedule {
         self.linkData = linkData
         self.dateCandidates = dateCandidates
         self.placeCandidates = placeCandidates
+        self.plan = plan
     }
 }
 @Model
@@ -35,8 +37,17 @@ final class Plan {
     var planimageData: Data
     var planColor: Int
     var planDate: Date
+
+    @Relationship(deleteRule: .cascade)
     var schedule: [Schedule] = []
-    init(plantitle: String, planimageData: Data, planColor: Int, planDate: Date,schedule: [Schedule] = []) {
+
+    init(
+        plantitle: String,
+        planimageData: Data,
+        planColor: Int,
+        planDate: Date,
+        schedule: [Schedule] = []
+    ) {
         self.plantitle = plantitle
         self.planimageData = planimageData
         self.planColor = planColor
