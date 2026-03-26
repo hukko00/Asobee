@@ -19,10 +19,13 @@ struct RootView: View {
 
 struct LoginView: View {
     @EnvironmentObject var authVM: AuthViewModel
+    
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
+                TextField("ユーザー名", text: $authVM.username)
+                    .textFieldStyle(.roundedBorder)
                 TextField("メールアドレス", text: $authVM.email)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.emailAddress)
@@ -41,6 +44,9 @@ struct LoginView: View {
                     authVM.signIn()
                 }
                 .buttonStyle(.bordered)
+                if let user = Auth.auth().currentUser {
+                    Text(user.displayName ?? "名前なし")
+                }
 
                 if !authVM.errorMessage.isEmpty {
                     Text(authVM.errorMessage)

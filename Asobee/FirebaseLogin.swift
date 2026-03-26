@@ -8,6 +8,7 @@ final class AuthViewModel: ObservableObject {
     @Published var password = ""
     @Published var isLoggedIn = false
     @Published var errorMessage = ""
+    @Published var username = ""
 
     private var handle: AuthStateDidChangeListenerHandle?
 
@@ -24,21 +25,39 @@ final class AuthViewModel: ObservableObject {
     }
 
     func signUp() {
-        errorMessage = ""
-
-        Auth.auth().createUser(withEmail: email, password: password) { [weak self] _, error in
-            if let error = error {
-                self?.errorMessage = error.localizedDescription
+        Auth.auth().createUser(withEmail: email, password: password) { result, error in
+            if let user = result?.user {
+                let changeRequest = user.createProfileChangeRequest()
+                changeRequest.displayName = self.username
+                changeRequest.commitChanges { error in
+                    if error == nil {
+                        DispatchQueue.main.async {
+                            self.isLoggedIn = true
+                        }
+                    }
+                }
             }
         }
     }
 
     func signIn() {
-        errorMessage = ""
+        Auth.auth().signIn(withEmail: email, password: password) { result, error in
+            if let user = result?.user {
 
-        Auth.auth().signIn(withEmail: email, password: password) { [weak self] _, error in
-            if let error = error {
-                self?.errorMessage = error.localizedDescription
+                if user.displayName != self.username {
+                    do {
+                        try Auth.auth().signOut()
+                    } catch {}
+
+                    DispatchQueue.main.async {
+                        self.errorMessage = "ユーザー名が違います"
+                    }
+                    return
+                }
+
+                DispatchQueue.main.async {
+                    self.isLoggedIn = true
+                }
             }
         }
     }
