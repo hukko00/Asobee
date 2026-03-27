@@ -24,18 +24,35 @@ final class AuthViewModel: ObservableObject {
         }
     }
 
-    func signUp() {
+    func signUp(completion: @escaping (Bool) -> Void) {
         Auth.auth().createUser(withEmail: email, password: password) { result, error in
-            if let user = result?.user {
-                let changeRequest = user.createProfileChangeRequest()
-                changeRequest.displayName = self.username
-                changeRequest.commitChanges { error in
-                    if error == nil {
-                        DispatchQueue.main.async {
-                            self.isLoggedIn = true
-                        }
-                    }
+            
+            if let error = error {
+                print("登録失敗: \(error)")
+                completion(false)
+                return
+            }
+            
+            guard let user = result?.user else {
+                completion(false)
+                return
+            }
+            
+            let changeRequest = user.createProfileChangeRequest()
+            changeRequest.displayName = self.username
+            
+            changeRequest.commitChanges { error in
+                if let error = error {
+                    print("プロフィール更新失敗: \(error)")
+                    completion(false)
+                    return
                 }
+                
+                DispatchQueue.main.async {
+                    self.isLoggedIn = true
+                }
+                
+                completion(true)
             }
         }
     }
