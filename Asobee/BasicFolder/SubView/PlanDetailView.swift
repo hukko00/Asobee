@@ -54,7 +54,7 @@ struct PlanDetailView: View {
         let db = Firestore.firestore()
         
         db.collection("times")
-            .whereField("Planid", isEqualTo: planId) // ← 修正
+            .whereField("Planid", isEqualTo: planId)
             .getDocuments { snapshot, error in
                 
                 if error != nil {

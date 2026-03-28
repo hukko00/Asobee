@@ -35,29 +35,12 @@ struct FriendView: View {
                     }
                 } label: {
                     Text("フレンド申請")
-                        .background(.blue)
-                        .foregroundStyle(.white)
-                        .padding(15)
                         .font(.title)
-                        .clipShape(Capsule())
-                }
-                Button {
-                    getUserInfoFromFriendCode(friendCode: inputCode) { uid, name in
-                        if let uid = uid {
-                            print("UID:", uid)
-                            followUser(friendUid: uid)
-                        } else {
-                            print("ユーザーが見つかりません")
-                        }
-                    }
-                    print("OK!!!(><)")
-                } label: {
-                    Text("フレンド確認")
-                        .background(.blue)
-                        .foregroundStyle(.white)
                         .padding(15)
-                        .font(.title)
-                        .clipShape(Capsule())
+                        .foregroundStyle(Color.white)
+                        .bold()
+                        .background(Color.blue)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
                 }
             }
             .onAppear {
