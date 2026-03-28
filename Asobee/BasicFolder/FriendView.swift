@@ -6,31 +6,26 @@ struct FriendView: View {
     @State private var inputCode: String = ""
     @State private var myFriendCode: String = ""
     @State private var myCode: String = ""
+    @State private var friendStatus: String = ""
     
     var body: some View {
         NavigationStack{
             VStack {
-                NavigationLink{
-                    FriendListView()
-                } label:{
-                    Text("フレンドリスト")
-                        .font(.title)
-                        .padding(15)
-                        .foregroundStyle(Color.white)
-                        .bold()
-                        .background(Color.blue)
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                }
-                .padding(.bottom, 70)
-                Text(myCode)
+                Text("あなたのフレンドコード:\(myCode)")
+                    .font(.title3)
+                    .padding()
                 TextField("フレンドコードを入力してください", text: $inputCode)
+                    .padding(.horizontal, 50)
+                    .padding()
                 Button {
                     getUserInfoFromFriendCode(friendCode: inputCode) { uid, name in
                         if let uid = uid {
                             print("UID:", uid)
                             followUser(friendUid: uid)
+                            friendStatus = "フレンド申請できました！"
                         } else {
                             print("ユーザーが見つかりません")
+                            friendStatus = "コードが違います！入力されたコードを確認して下さい！"
                         }
                     }
                 } label: {
@@ -42,6 +37,18 @@ struct FriendView: View {
                         .background(Color.blue)
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                 }
+                Text(friendStatus)
+                    .font(.title3)
+                    .foregroundStyle(Color.red)
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink {
+                        FriendListView()
+                    } label: {
+                        Image(systemName: "list.bullet")
+                    }
+                }
             }
             .onAppear {
                 getMyFriendCode { code in
@@ -52,6 +59,7 @@ struct FriendView: View {
                         }
                     }
                 }
+                friendStatus = ""
             }
         }
     }
