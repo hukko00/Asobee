@@ -11,7 +11,7 @@ struct ContentView: View {
                 if Viewnumber == 1 {
                     ProfileView()
                 } else if Viewnumber == 2 {
-                    AddPlanView()
+                    PlanView()
                 } else if Viewnumber == 3 {
                     FriendView()
                 }

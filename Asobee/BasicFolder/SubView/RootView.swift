@@ -96,7 +96,7 @@ struct LoginVisionView: View {
         print("OK!!")
     }
     private func generateCode() -> String {
-        let characters = Array("ABCDEFGHJKLMNOPQRSTUVWXYZ234567890")
+        let characters = Array("ABCDEFGHJKLMNOPQRSTUVWXYZ234567890!?#")
         var result = ""
 
         for _ in 0..<8 {

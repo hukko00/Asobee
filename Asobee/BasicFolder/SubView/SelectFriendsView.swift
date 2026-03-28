@@ -10,11 +10,35 @@ struct Friend3: Identifiable {
 
 struct SelectFriendsView: View {
     @State private var friends: [Friend3] = []
+    @Binding var selectedFriends: [String]
+    @State private var statusMessage = ""
+    @State private var statusImage = "plus.circle"
 
 
     var body: some View {
         List(friends) { friend in
-            Text(friend.name)
+            HStack{
+                Text(friend.name)
+                Text(statusMessage)
+                    .font(Font.title3.bold())
+                Button{
+                    if !selectedFriends.contains(friend.id) {
+                        selectedFriends.append(friend.id)
+                        print("保存完了")
+                        statusMessage = "保存完了"
+                    } else {
+                        print("保存失敗")
+                        statusMessage = "保存失敗 もう追加しています"
+                    }
+                    statusImage = "checkmark.circle"
+                } label:{
+                    Image(systemName:statusImage)
+                        .font(Font.title3.bold())
+                }
+            }
+        }
+        .onAppear {
+            selectedFriends = []
         }
         .onAppear {
             fetchFriends { result in
