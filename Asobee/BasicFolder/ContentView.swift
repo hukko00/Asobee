@@ -25,7 +25,7 @@ struct ContentView: View {
                 tabButton(icon: "person.2", title: "フレンド", index: 3)
             }
             .padding(.vertical, 10)
-            .background(Color(.systemGray6))
+            .background(Color(.white))
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
             .padding(.bottom, 8)

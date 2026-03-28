@@ -5,6 +5,7 @@ import FirebaseAuth
 struct AddPlanView: View {
     @State private var text = ""
     @State private var selectedFriendIds: [String] = []
+    @State private var isNavigate = false
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -37,6 +38,7 @@ struct AddPlanView: View {
                 Spacer()
                 Button {
                     createPlan(title: text, selectedFriendIds: selectedFriendIds)
+                    isNavigate = true
                 } label: {
                     Text("プラン作成")
                         .font(.headline)
@@ -47,6 +49,9 @@ struct AddPlanView: View {
                         .cornerRadius(12)
                 }
                 .disabled(text.isEmpty)
+                .navigationDestination(isPresented: $isNavigate) {
+                    PlanView()
+                }
                 
             }
             .padding()

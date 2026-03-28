@@ -117,10 +117,6 @@ struct LoggedInView: View {
             Text("ログイン中")
                 .font(.title)
 
-            if let user = Auth.auth().currentUser {
-                Text(user.email ?? "メールなし")
-            }
-
             Button("ログアウト") {
                 authVM.signOut()
             }

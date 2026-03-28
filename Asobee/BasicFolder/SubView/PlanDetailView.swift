@@ -16,12 +16,21 @@ struct PlanDetailView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                List(times) { time in
-                    VStack(alignment: .leading) {
-                        Text("\(time.departureStation) → \(time.arrivalStation)")
-                        Text("\(time.departureTime) - \(time.arrivalTime)")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                List {
+                    ForEach(times) { time in
+                        VStack(alignment: .leading) {
+                            Text("\(time.departureStation) → \(time.arrivalStation)")
+                            Text("\(time.departureTime) - \(time.arrivalTime)")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                        .swipeActions {
+                            Button(role: .destructive) {
+                                deleteTimeItem(time: time)
+                            } label: {
+                                Label("削除", systemImage: "trash")
+                            }
+                        }
                     }
                 }
                 
@@ -86,5 +95,21 @@ struct PlanDetailView: View {
                 }
                 completion(results)
             }
+    }
+    func deleteTimeItem(time: TimeItem) {
+        let db = Firestore.firestore()
+        
+        db.collection("times")
+            .document(time.id)
+            .delete { error in
+                if let error = error {
+                    print("削除失敗: \(error)")
+                } else {
+                    print("削除成功")
+                }
+            }
+        
+        // UI更新
+        times.removeAll { $0.id == time.id }
     }
 }

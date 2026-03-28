@@ -14,17 +14,26 @@ struct PlanView: View {
     
     var body: some View {
         NavigationStack {
-            List(plans) { plan in
-                NavigationLink {
-                    PlanDetailView(plan: plan)
-                } label: {
-                    VStack(alignment: .leading) {
-                        Text(plan.title)
-                            .font(.headline)
-                        
-                        Text("owner: \(plan.ownerId)")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+            List {
+                ForEach(plans) { plan in
+                    NavigationLink {
+                        PlanDetailView(plan: plan)
+                    } label: {
+                        VStack(alignment: .leading) {
+                            Text(plan.title)
+                                .font(.headline)
+                            
+                            Text("owner: \(plan.ownerId)")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    .swipeActions {
+                        Button(role: .destructive) {
+                            deletePlan(plan: plan)
+                        } label: {
+                            Label("削除", systemImage: "trash")
+                        }
                     }
                 }
             }
@@ -34,7 +43,7 @@ struct PlanView: View {
                 NavigationLink {
                     AddPlanView()
                 } label: {
-                    Image(systemName: "plus.circle")
+                    Image(systemName: "plus")
                         .font(.title2)
                 }
             }
@@ -101,6 +110,22 @@ struct PlanView: View {
             
             completion(unique)
         }
+    }
+    func deletePlan(plan: PlanItem) {
+        let db = Firestore.firestore()
+        
+        db.collection("plans")
+            .document(plan.id)
+            .delete { error in
+                if let error = error {
+                    print("削除失敗: \(error)")
+                } else {
+                    print("削除成功")
+                }
+            }
+        
+        // UI更新
+        plans.removeAll { $0.id == plan.id }
     }
 }
 
