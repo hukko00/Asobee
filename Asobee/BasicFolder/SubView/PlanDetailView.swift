@@ -93,7 +93,11 @@ struct PlanDetailView: View {
                     
                     results.append(time)
                 }
-                completion(results)
+                completion(
+                    results.sorted {
+                        $0.arrivalTime < $1.arrivalTime
+                    }
+                )
             }
     }
     func deleteTimeItem(time: TimeItem) {

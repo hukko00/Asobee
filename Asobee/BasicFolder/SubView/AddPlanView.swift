@@ -6,6 +6,8 @@ struct AddPlanView: View {
     @State private var text = ""
     @State private var selectedFriendIds: [String] = []
     @State private var isNavigate = false
+    @State private var errorMessage: String? = nil
+    @State private var showError: Bool = false
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -37,7 +39,12 @@ struct AddPlanView: View {
                 }
                 Spacer()
                 Button {
-                    createPlan(title: text, selectedFriendIds: selectedFriendIds)
+                    createPlan(title: text, selectedFriendIds: selectedFriendIds) { error in
+                        if let error = error {
+                            errorMessage = error.localizedDescription
+                            showError = true
+                        }
+                    }
                     isNavigate = true
                 } label: {
                     Text("プラン作成")
@@ -47,6 +54,11 @@ struct AddPlanView: View {
                         .padding()
                         .background(text.isEmpty ? Color.gray : Color.blue)
                         .cornerRadius(12)
+                }
+                .alert("エラー", isPresented: $showError) {
+                    Button("OK", role: .cancel) {}
+                } message: {
+                    Text(errorMessage ?? "")
                 }
                 .disabled(text.isEmpty)
                 .navigationDestination(isPresented: $isNavigate) {
@@ -59,8 +71,16 @@ struct AddPlanView: View {
         }
     }
     
-    func createPlan(title: String, selectedFriendIds: [String]) {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
+    func createPlan(
+        title: String,
+        selectedFriendIds: [String],
+        completion: @escaping (Error?) -> Void
+    ) {
+        guard let userId = Auth.auth().currentUser?.uid else {
+            completion(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "ユーザーがいません"]))
+            return
+        }
+        
         let db = Firestore.firestore()
         
         let planData: [String: Any] = [
@@ -72,9 +92,11 @@ struct AddPlanView: View {
         db.collection("plans").addDocument(data: planData) { error in
             if let error = error {
                 print("作成失敗: \(error)")
+                completion(error) // ← エラー返す
             } else {
                 print("作成成功")
-                dismiss() 
+                dismiss()
+                completion(nil) // ← 成功
             }
         }
     }
