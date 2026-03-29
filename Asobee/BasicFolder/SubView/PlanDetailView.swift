@@ -17,18 +17,13 @@ struct PlanDetailView: View {
         NavigationStack {
             VStack {
                 
-                if times.isEmpty {
-                    Text("時間のデータがまだありません\nデータを追加して下さい")
-                        .foregroundStyle(Color.gray)
-                        .font(.title3.bold())
-                    List{
-                        
-                    }
-                    .refreshable {
-                        fetchTimes()
-                    }
-                } else{
-                    List{
+                List {
+                    if times.isEmpty {
+                        Text("時間のデータがまだありません\nデータを追加して下さい")
+                            .foregroundStyle(Color.gray)
+                            .font(.title3.bold())
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    } else {
                         ForEach(times) { time in
                             VStack(alignment: .leading) {
                                 Text("\(time.departureStation) → \(time.arrivalStation)")
@@ -45,9 +40,9 @@ struct PlanDetailView: View {
                             }
                         }
                     }
-                    .refreshable {
-                        fetchTimes()
-                    }
+                }
+                .refreshable {
+                    fetchTimes()
                 }
                 
                 NavigationLink {

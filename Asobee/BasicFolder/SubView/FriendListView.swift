@@ -13,6 +13,8 @@ struct FriendListView: View {
 
 
     var body: some View {
+        Text("フレンド一覧")
+            .font(Font.largeTitle.bold())
         List(friends) { friend in
             Text(friend.name)
         }

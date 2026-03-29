@@ -11,6 +11,9 @@ struct PlanItem: Identifiable {
 
 struct PlanView: View {
     @State private var plans: [PlanItem] = []
+    @State private var userName: String = ""
+    @State private var ownerName: String = "読み込み中..."
+    @State private var ownerNameCache: [String: String] = [:]
     
     var body: some View {
         NavigationStack {
@@ -38,10 +41,17 @@ struct PlanView: View {
                             VStack(alignment: .leading) {
                                 Text(plan.title)
                                     .font(.headline)
-                                
-                                Text("owner: \(plan.ownerId)")
+
+                                Text("owner: \(ownerNameCache[plan.ownerId] ?? ownerName)")
                                     .font(.caption)
                                     .foregroundColor(.gray)
+                            }
+                            .onAppear {
+                                if ownerNameCache[plan.ownerId] == nil {
+                                    fetchUserName(uid: plan.ownerId) { name in
+                                        ownerNameCache[plan.ownerId] = name
+                                    }
+                                }
                             }
                         }
                         .swipeActions {
@@ -151,4 +161,27 @@ struct PlanView: View {
             plans = result
         }
     }
+    func fetchUserName(uid: String, completion: @escaping (String) -> Void) {
+        let db = Firestore.firestore()
+        
+        db.collection("users")
+            .document(uid)
+            .getDocument { snapshot, error in
+                
+                if let error = error {
+                    print("取得失敗: \(error)")
+                    completion("不明なユーザー")
+                    return
+                }
+                
+                guard let data = snapshot?.data() else {
+                    completion("不明なユーザー")
+                    return
+                }
+                
+                let name = data["name"] as? String ?? "名前なし"
+                completion(name)
+            }
+    }
 }
+
