@@ -16,21 +16,37 @@ struct PlanDetailView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                List {
-                    ForEach(times) { time in
-                        VStack(alignment: .leading) {
-                            Text("\(time.departureStation) → \(time.arrivalStation)")
-                            Text("\(time.departureTime) - \(time.arrivalTime)")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                        .swipeActions {
-                            Button(role: .destructive) {
-                                deleteTimeItem(time: time)
-                            } label: {
-                                Label("削除", systemImage: "trash")
+                
+                if times.isEmpty {
+                    Text("時間のデータがまだありません\nデータを追加して下さい")
+                        .foregroundStyle(Color.gray)
+                        .font(.title3.bold())
+                    List{
+                        
+                    }
+                    .refreshable {
+                        fetchTimes()
+                    }
+                } else{
+                    List{
+                        ForEach(times) { time in
+                            VStack(alignment: .leading) {
+                                Text("\(time.departureStation) → \(time.arrivalStation)")
+                                Text("\(time.departureTime) - \(time.arrivalTime)")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                            .swipeActions {
+                                Button(role: .destructive) {
+                                    deleteTimeItem(time: time)
+                                } label: {
+                                    Label("削除", systemImage: "trash")
+                                }
                             }
                         }
+                    }
+                    .refreshable {
+                        fetchTimes()
                     }
                 }
                 
@@ -115,5 +131,10 @@ struct PlanDetailView: View {
         
         // UI更新
         times.removeAll { $0.id == time.id }
+    }
+    func fetchTimes(){
+        getTimes(planId: plan.id) { times in
+            self.times = times
+        }
     }
 }

@@ -14,38 +14,57 @@ struct PlanView: View {
     
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(plans) { plan in
-                    NavigationLink {
-                        PlanDetailView(plan: plan)
-                    } label: {
-                        VStack(alignment: .leading) {
-                            Text(plan.title)
-                                .font(.headline)
-                            
-                            Text("owner: \(plan.ownerId)")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    .swipeActions {
-                        Button(role: .destructive) {
-                            deletePlan(plan: plan)
+            if plans.isEmpty {
+                Text("プランがまだありません\nプランを追加して下さい")
+                    .foregroundStyle(Color.gray)
+                    .font(.title3.bold())
+                    .toolbar {
+                        NavigationLink {
+                            AddPlanView()
                         } label: {
-                            Label("削除", systemImage: "trash")
+                            Image(systemName: "plus")
+                                .font(.title2)
+                        }
+                    }
+                    .refreshable {
+                        fetchPlans()
+                    }
+            } else{
+                List {
+                    ForEach(plans) { plan in
+                        NavigationLink {
+                            PlanDetailView(plan: plan)
+                        } label: {
+                            VStack(alignment: .leading) {
+                                Text(plan.title)
+                                    .font(.headline)
+                                
+                                Text("owner: \(plan.ownerId)")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        .swipeActions {
+                            Button(role: .destructive) {
+                                deletePlan(plan: plan)
+                            } label: {
+                                Label("削除", systemImage: "trash")
+                            }
                         }
                     }
                 }
-            }
-            .navigationTitle("プラン一覧")
-            
-            .toolbar {
-                NavigationLink {
-                    AddPlanView()
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.title2)
+                .refreshable {
+                    fetchPlans()
                 }
+                .toolbar {
+                    NavigationLink {
+                        AddPlanView()
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.title2)
+                    }
+                }
+                .navigationTitle("プラン一覧")
             }
         }
         .onAppear {
@@ -127,5 +146,9 @@ struct PlanView: View {
         // UI更新
         plans.removeAll { $0.id == plan.id }
     }
+    func fetchPlans(){
+        fetchMyPlans { result in
+            plans = result
+        }
+    }
 }
-
