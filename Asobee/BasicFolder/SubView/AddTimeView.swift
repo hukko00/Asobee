@@ -53,7 +53,7 @@ struct AddTimeView: View {
                     .padding()
                 }
                 .navigationDestination(isPresented: $isShowAddView) {
-                    TestView(plan: plan)
+                    ChatView(plan: plan)
                 }
             }
         }

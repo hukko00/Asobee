@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var Viewnumber = 2
     @StateObject private var keyboard = KeyboardObserver()
+    @EnvironmentObject var tabBarState: TabBarState
     
     var body: some View {
         VStack(spacing: 0) {
@@ -20,7 +21,7 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             
             // タブバー
-            if !keyboard.isVisible {
+            if tabBarState.isVisible {
                 HStack {
                     tabButton(icon: "airplane.up.forward", title: "プラン", index: 2)
                     tabButton(icon: "person.fill", title: "プロフィール", index: 1)

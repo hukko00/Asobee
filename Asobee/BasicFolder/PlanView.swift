@@ -28,6 +28,7 @@ struct PlanView: View {
                             Image(systemName: "plus")
                                 .font(.title2)
                         }
+                        .navigationBarBackButtonHidden(true)
                     }
                     .refreshable {
                         fetchPlans()
@@ -36,7 +37,7 @@ struct PlanView: View {
                 List {
                     ForEach(plans) { plan in
                         NavigationLink {
-                            TestView(plan: plan)
+                            ChatView(plan: plan)
                         } label: {
                             VStack(alignment: .leading) {
                                 Text(plan.title)

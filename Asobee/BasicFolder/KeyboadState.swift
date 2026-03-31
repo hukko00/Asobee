@@ -29,3 +29,7 @@ class KeyboardObserver: ObservableObject {
         isVisible = false
     }
 }
+
+class TabBarState: ObservableObject {
+    @Published var isVisible: Bool = true
+}
