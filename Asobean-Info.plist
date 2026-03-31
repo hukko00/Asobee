@@ -4,5 +4,11 @@
 <dict>
 	<key></key>
 	<string></string>
+    <key>UIAppFonts</key>
+    <array>
+        <string>KiwiMaru-Regular.ttf</string>
+        <string>KiwiMaru-Medium.ttf</string>
+        <string>KiwiMaru-Light.ttf</string>
+    </array>
 </dict>
 </plist>

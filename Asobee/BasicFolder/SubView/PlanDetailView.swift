@@ -1,18 +1,20 @@
 import SwiftUI
 import FirebaseFirestore
 
-struct TimeItem: Identifiable {
-    let id: String
-    let departureTime: String
-    let departureStation: String
-    let arrivalTime: String
-    let arrivalStation: String
-}
+//struct TimeItem: Identifiable {
+//    let id: String
+//    let departureTime: String
+//    let departureStation: String
+//    let arrivalTime: String
+//    let arrivalStation: String
+//}
 
 struct PlanDetailView: View {
     var plan: PlanItem
-    @State private var times: [TimeItem] = []
     
+    @State private var times: [TimeItem] = []
+    @State private var listener: ListenerRegistration?
+
     var body: some View {
         NavigationStack {
             VStack {
@@ -41,9 +43,6 @@ struct PlanDetailView: View {
                         }
                     }
                 }
-                .refreshable {
-                    fetchTimes()
-                }
                 
                 NavigationLink {
                     AddTimeView(plan: plan)
@@ -63,58 +62,91 @@ struct PlanDetailView: View {
             .navigationTitle("詳細")
         }
         .onAppear {
-            
-            getTimes(planId: plan.id) { times in
-                self.times = times
-            }
+            listenTimes(planId: plan.id)
+        }
+        .onDisappear {
+            listener?.remove()
         }
     }
     
-    func getTimes(planId: String, completion: @escaping ([TimeItem]) -> Void) {
+    
+    func listenTimes(planId: String) {
         let db = Firestore.firestore()
-        
-        db.collection("times")
-            .whereField("Planid", isEqualTo: planId)
-            .getDocuments { snapshot, error in
+
+        print("🚀 listenTimes開始 planId:", planId)
+
+        // フォーマッタは外で1回だけ
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+
+        listener = db.collection("plans")
+            .document(planId)
+            .collection("times")
+            .order(by: "departureTime") // ← ここ変更
+            .addSnapshotListener { snapshot, error in
                 
-                if error != nil {
-                    completion([])
+                print("🔥 snapshot受信")
+                
+                if let error = error {
+                    print("❌ 取得失敗:", error)
                     return
                 }
                 
+                guard let snapshot = snapshot else {
+                    print("❌ snapshotがnil")
+                    return
+                }
+                
+                print("📦 documents数:", snapshot.documents.count)
+                
                 var results: [TimeItem] = []
                 
-                for doc in snapshot?.documents ?? [] {
+                for doc in snapshot.documents {
                     let data = doc.data()
                     
+                    print("📄 docID:", doc.documentID)
                     print("📄 data:", data)
-                    let departureTime = (data["departuretime"] as? Timestamp)?.dateValue()
-                    let arrivalTime = (data["arrivaltime"] as? Timestamp)?.dateValue()
                     
-                    let formatter = DateFormatter()
-                    formatter.dateFormat = "HH:mm"
+                    // 🔥 型チェックしながら取得
+                    guard let departureTimestamp = data["departureTime"] as? Timestamp,
+                          let arrivalTimestamp = data["arrivalTime"] as? Timestamp,
+                          let departureStation = data["departureStation"] as? String,
+                          let arrivalStation = data["arrivalStation"] as? String else {
+                        
+                        print("⚠️ データ不正:", data)
+                        continue
+                    }
+                    
+                    let departureTimeString = formatter.string(from: departureTimestamp.dateValue())
+                    let arrivalTimeString = formatter.string(from: arrivalTimestamp.dateValue())
                     
                     let time = TimeItem(
                         id: doc.documentID,
-                        departureTime: departureTime != nil ? formatter.string(from: departureTime!) : "",
-                        departureStation: data["departurestation"] as? String ?? "",
-                        arrivalTime: arrivalTime != nil ? formatter.string(from: arrivalTime!) : "",
-                        arrivalStation: data["arrivestation"] as? String ?? ""
+                        departureTime: departureTimeString,
+                        departureStation: departureStation,
+                        arrivalTime: arrivalTimeString,
+                        arrivalStation: arrivalStation
                     )
                     
                     results.append(time)
                 }
-                completion(
-                    results.sorted {
-                        $0.arrivalTime < $1.arrivalTime
-                    }
-                )
+                
+                print("✅ 最終results数:", results.count)
+                
+                DispatchQueue.main.async {
+                    print("🎯 UI更新")
+                    self.times = results
+                }
             }
     }
+    
+    // 削除
     func deleteTimeItem(time: TimeItem) {
         let db = Firestore.firestore()
         
-        db.collection("times")
+        db.collection("plans")
+            .document(plan.id)
+            .collection("times")
             .document(time.id)
             .delete { error in
                 if let error = error {
@@ -123,13 +155,5 @@ struct PlanDetailView: View {
                     print("削除成功")
                 }
             }
-        
-        // UI更新
-        times.removeAll { $0.id == time.id }
-    }
-    func fetchTimes(){
-        getTimes(planId: plan.id) { times in
-            self.times = times
-        }
     }
 }

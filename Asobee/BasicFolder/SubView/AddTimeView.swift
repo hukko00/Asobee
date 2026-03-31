@@ -53,30 +53,32 @@ struct AddTimeView: View {
                     .padding()
                 }
                 .navigationDestination(isPresented: $isShowAddView) {
-                    PlanDetailView(plan: plan)
+                    TestView(plan: plan)
                 }
             }
         }
     }
-    func createPlan(time: Date, station: String,lastTime: Date,lastStation: String,id:String) {
+    func createPlan(time: Date, station: String, lastTime: Date, lastStation: String, id: String) {
         guard (Auth.auth().currentUser?.uid) != nil else { return }
+        
         let db = Firestore.firestore()
         
-        
-        let planData: [String: Any] = [
-            "departuretime" : time,
-            "departurestation" : station,
-            "arrivaltime" : lastTime,
-            "arrivestation" : lastStation,
-            "Planid" : id,
-        ]
-        
-        db.collection("times").addDocument(data: planData) { error in
-            if let error = error {
-                print("作成失敗: \(error)")
-            } else {
-                print("作成成功")
+        db.collection("plans")
+            .document(id)
+            .collection("times")
+            .addDocument(data: [
+                "departureStation": station,
+                "arrivalStation": lastStation,
+                "departureTime": Timestamp(date: time),
+                "arrivalTime": Timestamp(date: lastTime),
+                "createdAt": Timestamp()
+            ]) { error in
+                
+                if let error = error {
+                    print("❌ 作成失敗:", error)
+                } else {
+                    print("✅ 作成成功")
+                }
             }
-        }
     }
 }

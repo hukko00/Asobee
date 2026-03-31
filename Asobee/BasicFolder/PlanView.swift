@@ -36,7 +36,7 @@ struct PlanView: View {
                 List {
                     ForEach(plans) { plan in
                         NavigationLink {
-                            PlanDetailView(plan: plan)
+                            TestView(plan: plan)
                         } label: {
                             VStack(alignment: .leading) {
                                 Text(plan.title)
@@ -111,14 +111,13 @@ struct PlanView: View {
         }
         
         // 自分がオーナー
-        group.enter()
         db.collection("plans")
             .whereField("ownerId", isEqualTo: myUid)
-            .getDocuments { snapshot, error in
-                if let docs = snapshot?.documents {
-                    parseDocs(docs)
-                }
-                group.leave()
+            .addSnapshotListener { snapshot, error in
+                
+                guard let docs = snapshot?.documents else { return }
+                
+                parseDocs(docs)
             }
         
         // 招待されている
