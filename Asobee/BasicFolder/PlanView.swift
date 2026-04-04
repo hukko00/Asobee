@@ -16,71 +16,86 @@ struct PlanView: View {
     @State private var ownerNameCache: [String: String] = [:]
     
     var body: some View {
-        NavigationStack {
-            if plans.isEmpty {
-                Text("プランがまだありません\nプランを追加して下さい")
-                    .foregroundStyle(Color.gray)
-                    .font(.title3.bold())
-                    .toolbar {
-                        NavigationLink {
-                            AddPlanView()
-                        } label: {
-                            Image(systemName: "plus")
-                                .font(.title2)
-                        }
-                        .navigationBarBackButtonHidden(true)
-                    }
-                    .refreshable {
-                        fetchPlans()
-                    }
-            } else{
-                List {
-                    ForEach(plans) { plan in
-                        NavigationLink {
-                            ChatView(plan: plan)
-                        } label: {
-                            VStack(alignment: .leading) {
-                                Text(plan.title)
-                                    .font(.headline)
-
-                                Text("owner: \(ownerNameCache[plan.ownerId] ?? ownerName)")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
+        ZStack{
+            NavigationStack {
+                VStack{
+                    if plans.isEmpty {
+                        Text("プランがまだありません\nプランを追加して下さい")
+                            .foregroundStyle(Color.gray)
+                            .font(.title3.bold())
+                            .toolbar {
+                                NavigationLink {
+                                    AddPlanView()
+                                } label: {
+                                    Image(systemName: "plus")
+                                        .font(.title2)
+                                }
+                                .navigationBarBackButtonHidden(true)
                             }
-                            .onAppear {
-                                if ownerNameCache[plan.ownerId] == nil {
-                                    fetchUserName(uid: plan.ownerId) { name in
-                                        ownerNameCache[plan.ownerId] = name
+                            .refreshable {
+                                fetchPlans()
+                            }
+                    } else{
+                        VStack{
+                            ScrollView {
+                                VStack(spacing: 12) {
+                                    ForEach(plans) { plan in
+                                        NavigationLink {
+                                            ChatView(plan: plan)
+                                        } label: {
+                                            VStack(alignment: .leading, spacing: 6) {
+                                                
+                                                Text(plan.title)
+                                                    .font(.custom("KiwiMaru-Medium", size: 20))
+                                                    .foregroundColor(.black)
+                                                
+                                                Text("owner: \(ownerNameCache[plan.ownerId] ?? ownerName)")
+                                                    .font(.custom("KiwiMaru-Light", size: 14))
+                                                    .foregroundColor(.gray)
+                                            }
+                                            .padding()
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .background(colorcode(r: 235, g: 225, b: 215))
+                                            .cornerRadius(16)
+                                            .shadow(color: .black.opacity(0.08), radius: 5, x: 0, y: 2)
+                                        }
+                                        .padding(.horizontal)
+                                        .onAppear {
+                                            if ownerNameCache[plan.ownerId] == nil {
+                                                fetchUserName(uid: plan.ownerId) { name in
+                                                    ownerNameCache[plan.ownerId] = name
+                                                }
+                                            }
+                                        }
                                     }
                                 }
+                                .padding(.top)
+                            }
+                            .refreshable {
+                                fetchPlans()
                             }
                         }
-                        .swipeActions {
-                            Button(role: .destructive) {
-                                deletePlan(plan: plan)
+                        .scrollContentBackground(.hidden)
+                        .refreshable {
+                            fetchPlans()
+                        }
+                        .toolbar {
+                            NavigationLink {
+                                AddPlanView()
                             } label: {
-                                Label("削除", systemImage: "trash")
+                                Image(systemName: "plus")
+                                    .font(.title2)
                             }
                         }
                     }
                 }
-                .refreshable {
-                    fetchPlans()
-                }
-                .toolbar {
-                    NavigationLink {
-                        AddPlanView()
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.title2)
+            }
+            .onAppear {
+                if plans.isEmpty {
+                    fetchMyPlans { result in
+                        plans = result
                     }
                 }
-                .navigationTitle("プラン一覧")
-            }
-        }
-        .onAppear {
-            fetchMyPlans { result in
-                plans = result
             }
         }
     }
@@ -183,5 +198,27 @@ struct PlanView: View {
                 completion(name)
             }
     }
+    func colorcode(r:Int,g:Int,b:Int)-> Color{
+        return Color(red: Double(r)/255, green: Double(g)/255, blue: Double(b)/255)
+    }
+    init(previewPlans: [PlanItem] = [], previewNames: [String: String] = [:]) {
+        if !previewPlans.isEmpty {
+            _plans = State(initialValue: previewPlans)
+        }
+        if !previewNames.isEmpty {
+            _ownerNameCache = State(initialValue: previewNames)
+        }
+    }
 }
-
+#Preview {
+    PlanView(
+        previewPlans: [
+            PlanItem(id: "1", title: "放課後あそぶ", ownerId: "user1", inviteFriends: []),
+            PlanItem(id: "2", title: "映画いく", ownerId: "user2", inviteFriends: [])
+        ],
+        previewNames: [
+            "user1": "たろう",
+            "user2": "じろう"
+        ]
+    )
+}

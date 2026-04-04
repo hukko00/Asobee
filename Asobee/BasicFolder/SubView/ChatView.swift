@@ -14,6 +14,7 @@ struct ChatItem: Identifiable {
     let chat: String
     let createdAt: Date
     let senderId: String
+    let senderName: String
 }
 struct ChatView: View {
     var plan: PlanItem
@@ -23,93 +24,135 @@ struct ChatView: View {
     @State var text: String = ""
     @EnvironmentObject var tabBarState: TabBarState
     @Environment(\.dismiss) var dismiss
+    @State private var showScrollButton = false
     
     var body: some View {
-        ZStack {
-            Color(colorcode(r: 247, g: 246, b: 242))//247, 246, 242
-                .ignoresSafeArea()
-            
-            VStack {
-                ZStack {
-                    // タイトル（常に中央）
-                    Text(plan.title)
-                        .font(.custom("KiwiMaru-Medium", size: 18))
-                    
-                    HStack {
-                        Button {
-                            dismiss()
-                        } label: {
-                            Image(systemName: "chevron.left")
-                                .font(.custom("KiwiMaru-Regular", size: 22))
-                                .foregroundColor(colorcode(r: 255, g: 162, b: 97))
-                        }
+        NavigationStack{
+            ZStack {
+                Color(colorcode(r: 247, g: 246, b: 242))//247, 246, 242
+                    .ignoresSafeArea()
+                
+                VStack {
+                    ZStack {
+                        // タイトル（常に中央）
+                        Text(plan.title)
+                            .font(.custom("KiwiMaru-Medium", size: 18))
                         
-                        Spacer()
+                        HStack {
+                            Button {
+                                dismiss()
+                            } label: {
+                                Image(systemName: "chevron.left")
+                                    .font(.custom("KiwiMaru-Regular", size: 22))
+                                    .foregroundColor(colorcode(r: 255, g: 162, b: 97))
+                            }
+                            
+                            Spacer()
+                        }
                     }
-                }
-                .padding(.horizontal, 20)
-                ScrollView {
-                    LazyVStack(alignment: .leading) {
-                        ForEach(chats) { chat in
-                            HStack{
-                                if chat.senderId == Auth.auth().currentUser?.uid {
-                                    Spacer()
-                                    Text(chat.chat)
-                                        .padding(8)
-                                        .font(Font.custom("KiwiMaru-Regular", size: 20))
-                                        .background(colorcode(r: 255, g: 162, b: 97))
-                                        .cornerRadius(10)
-                                        .padding(.horizontal,30)
-                                } else{
-                                    Text(chat.chat)
-                                        .padding(8)
-                                        .font(Font.custom("KiwiMaru-Regular", size: 20))
-                                        .background(colorcode(r: 127, g: 183, b: 126))
-                                        .cornerRadius(10)
-                                        .padding(.horizontal,30)
-                                    Spacer()
+                    .padding(.horizontal, 20)
+                    ScrollViewReader { proxy in
+                        ZStack(alignment: .bottomTrailing) {
+                            
+                            ScrollView {
+                                LazyVStack(alignment: .leading) {
+                                    ForEach(chats) { chat in
+                                        HStack {
+                                            if chat.senderId == Auth.auth().currentUser?.uid {
+                                                Spacer()
+                                                VStack{
+                                                    Text(chat.chat)
+                                                        .padding(8)
+                                                        .font(Font.custom("KiwiMaru-Regular", size: 20))
+                                                        .background(colorcode(r: 255, g: 162, b: 97))
+                                                        .cornerRadius(10)
+                                                        .padding(.horizontal, 30)
+                                                    Text(chat.senderName)
+                                                        .font(Font.custom("KiwiMaru-Regular", size: 12))
+                                                        .foregroundStyle(Color.black)
+                                                }
+                                            } else {
+                                                VStack{
+                                                    Text(chat.chat)
+                                                        .padding(8)
+                                                        .font(Font.custom("KiwiMaru-Regular", size: 20))
+                                                        .background(colorcode(r: 127, g: 183, b: 126))
+                                                        .cornerRadius(10)
+                                                        .padding(.horizontal, 30)
+                                                    HStack{
+                                                        Text(chat.senderName)
+                                                            .font(Font.custom("KiwiMaru-Regular", size: 12))
+                                                            .foregroundStyle(Color.black)
+                                                    }
+                                                }
+                                                Spacer()
+                                            }
+                                        }
+                                        .id(chat.id)
+                                    }
+                                }
+                            }
+                            if showScrollButton {
+                                Button {
+                                    if let last = chats.last {
+                                        withAnimation {
+                                            proxy.scrollTo(last.id, anchor: .bottom)
+                                        }
+                                    }
+                                    showScrollButton = false
+                                } label: {
+                                    Image(systemName: "arrow.down.circle.fill")
+                                        .font(.system(size: 40))
+                                        .foregroundColor(.gray)
+                                        .opacity(0.5)
+                                        .padding()
                                 }
                             }
                         }
+                        .onChange(of: chats.count) {
+                            showScrollButton = true
+                        }
                     }
-                }
-                Spacer()
-                
-                HStack(spacing: 12) {
-                    Button{
-                        
-                    } label:{
-                        Image(systemName: "plus")
-                            .font(.custom("KiwiMaru-Regular", size: 22))
-                            .foregroundColor(colorcode(r: 127, g: 183, b: 126))
-                    }
-                    Button{
-                        
-                    } label:{
-                        Image(systemName: "photo")
-                            .font(.system(size: 22))
-                            .foregroundColor(colorcode(r: 127, g: 183, b: 126))
-                    }
+                    Spacer()
                     
-                    TextField("メッセージを入力", text: $text)
-                        .font(.custom("KiwiMaru-Regular", size: 20))
-                        .padding(10)
-                        .background(Color.white)
-                        .cornerRadius(12)
-                    Button{
-                        createChat(chat: text)
-                        text = ""
-                    } label:{
-                        Image(systemName: "paperplane.fill")
-                            .foregroundColor(colorcode(r: 255, g: 162, b: 97))
-                            .font(.system(size: 22))
+                    HStack(spacing: 12) {
+                        NavigationLink{
+                            MapView(plan:plan)
+                        } label:{
+                            Image(systemName: "plus")
+                                .font(.custom("KiwiMaru-Regular", size: 22))
+                                .foregroundColor(colorcode(r: 127, g: 183, b: 126))
+                        }
+                        Button{
+                            
+                        } label:{
+                            Image(systemName: "photo")
+                                .font(.system(size: 22))
+                                .foregroundColor(colorcode(r: 127, g: 183, b: 126))
+                        }
+                        
+                        TextField("メッセージを入力", text: $text)
+                            .font(.custom("KiwiMaru-Regular", size: 20))
+                            .padding(10)
+                            .background(Color.white)
+                            .cornerRadius(12)
+                        Button{
+                            if !text.isEmpty {
+                                createChat(chat: text)
+                                text = ""
+                            }
+                        } label:{
+                            Image(systemName: "paperplane.fill")
+                                .foregroundColor(colorcode(r: 255, g: 162, b: 97))
+                                .font(.system(size: 22))
+                        }
                     }
+                    .padding(12)
+                    .background(colorcode(r: 234, g: 231, b: 220))
+                    .cornerRadius(20)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 10)
                 }
-                .padding(12)
-                .background(colorcode(r: 234, g: 231, b: 220))
-                .cornerRadius(20)
-                .padding(.horizontal, 16)
-                .padding(.bottom, 10)
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -210,21 +253,21 @@ struct ChatView: View {
         
         let db = Firestore.firestore()
         
-        db.collection("plans")
-            .document(plan.id)
-            .collection("messages")
-            .addDocument(data: [
-                "createdAt": Timestamp(date: Date()),
-                "chat": chat,
-                "senderId": uid // ← これ追加
-            ]) { error in
-                
-                if let error = error {
-                    print("❌ 作成失敗:", error)
-                } else {
-                    print("✅ 作成成功")
-                }
-            }
+        // 先に自分の名前取得（簡易）
+        db.collection("users").document(uid).getDocument { snapshot, _ in
+            
+            let name = snapshot?.data()?["userName"] as? String ?? "不明"
+            
+            db.collection("plans")
+                .document(plan.id)
+                .collection("messages")
+                .addDocument(data: [
+                    "createdAt": Timestamp(date: Date()),
+                    "chat": chat,
+                    "senderId": uid,
+                    "senderName": name // ← 追加
+                ])
+        }
     }
     func listenChats(planId: String, completion: @escaping ([ChatItem]) -> Void) {
         let db = Firestore.firestore()
@@ -251,7 +294,8 @@ struct ChatView: View {
                     
                     guard let chat = data["chat"] as? String,
                           let timestamp = data["createdAt"] as? Timestamp,
-                          let senderId = data["senderId"] as? String else {
+                          let senderId = data["senderId"] as? String,
+                          let senderName = data["senderName"] as? String else {
                         return nil
                     }
                     
@@ -259,11 +303,27 @@ struct ChatView: View {
                         id: doc.documentID,
                         chat: chat,
                         createdAt: timestamp.dateValue(),
-                        senderId: senderId
+                        senderId: senderId,
+                        senderName: senderName // ← 追加
                     )
                 }
                 
                 completion(chats)
+            }
+    }
+    func getUserName(uid: String, completion: @escaping (String) -> Void) {
+        let db = Firestore.firestore()
+        
+        db.collection("users")
+            .document(uid)
+            .getDocument { snapshot, error in
+                
+                if let data = snapshot?.data(),
+                   let name = data["userName"] as? String {
+                    completion(name)
+                } else {
+                    completion("不明")
+                }
             }
     }
 }

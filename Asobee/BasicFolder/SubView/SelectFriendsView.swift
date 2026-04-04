@@ -17,23 +17,29 @@ struct SelectFriendsView: View {
 
     var body: some View {
         List(friends) { friend in
-            HStack{
-                Text(friend.name)
-                Text(statusMessage)
-                    .font(Font.title3.bold())
-                Button{
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(friend.name)
+                    
+                    if selectedFriends.contains(friend.id) {
+                        Text("追加済み")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                    }
+                }
+                
+                Spacer()
+                
+                Button {
                     if !selectedFriends.contains(friend.id) {
                         selectedFriends.append(friend.id)
-                        print("保存完了")
-                        statusMessage = "保存完了"
                     } else {
-                        print("保存失敗")
-                        statusMessage = "保存失敗 もう追加しています"
+                        selectedFriends.removeAll { $0 == friend.id }
                     }
-                    statusImage = "checkmark.circle"
-                } label:{
-                    Image(systemName:statusImage)
-                        .font(Font.title3.bold())
+                } label: {
+                    Image(systemName: selectedFriends.contains(friend.id) ? "checkmark.circle.fill" : "plus.circle")
+                        .font(.title3)
+                        .foregroundColor(selectedFriends.contains(friend.id) ? .green : .gray)
                 }
             }
         }
@@ -80,6 +86,9 @@ struct SelectFriendsView: View {
                 completion(friends)
             }
         }
+    }
+    func colorcode(r:Int,g:Int,b:Int)-> Color{
+        return Color(red: Double(r)/255, green: Double(g)/255, blue: Double(b)/255)
     }
 }
 
