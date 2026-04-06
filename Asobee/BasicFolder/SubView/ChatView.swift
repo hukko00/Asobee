@@ -16,10 +16,36 @@ struct ChatItem: Identifiable {
     let senderId: String
     let senderName: String
 }
+struct MapItem: Identifiable {
+    let id: String
+    let lat: Double
+    let lng: Double
+    let createdAt: Date
+    let senderId: String
+    let senderName: String
+}
+
+struct TimelineItem: Identifiable {
+    let id: String
+    let senderId: String
+    let senderName: String
+    let createdAt: Date
+    let type: ItemType
+    
+    let chat: String?
+    let lat: Double?
+    let lng: Double?
+    
+    enum ItemType {
+        case chat
+        case map
+    }
+}
 struct ChatView: View {
     var plan: PlanItem
     @State private var chats: [ChatItem] = []
     @State private var times: [TimeItem] = []
+    @State private var maps: [MapItem] = []
     @State private var listener: ListenerRegistration?
     @State var text: String = ""
     @EnvironmentObject var tabBarState: TabBarState
@@ -56,39 +82,24 @@ struct ChatView: View {
                             
                             ScrollView {
                                 LazyVStack(alignment: .leading) {
-                                    ForEach(chats) { chat in
+
+                                    let items = makeTimelineItems(
+                                        chats: chats,
+                                        maps: maps
+                                    )
+
+                                    ForEach(items) { item in
                                         HStack {
-                                            if chat.senderId == Auth.auth().currentUser?.uid {
+
+                                            if item.senderId == Auth.auth().currentUser?.uid ?? "" {
                                                 Spacer()
-                                                VStack{
-                                                    Text(chat.chat)
-                                                        .padding(8)
-                                                        .font(Font.custom("KiwiMaru-Regular", size: 20))
-                                                        .background(colorcode(r: 255, g: 162, b: 97))
-                                                        .cornerRadius(10)
-                                                        .padding(.horizontal, 30)
-                                                    Text(chat.senderName)
-                                                        .font(Font.custom("KiwiMaru-Regular", size: 12))
-                                                        .foregroundStyle(Color.black)
-                                                }
+                                                messageView(item: item, isMe: true)
                                             } else {
-                                                VStack{
-                                                    Text(chat.chat)
-                                                        .padding(8)
-                                                        .font(Font.custom("KiwiMaru-Regular", size: 20))
-                                                        .background(colorcode(r: 127, g: 183, b: 126))
-                                                        .cornerRadius(10)
-                                                        .padding(.horizontal, 30)
-                                                    HStack{
-                                                        Text(chat.senderName)
-                                                            .font(Font.custom("KiwiMaru-Regular", size: 12))
-                                                            .foregroundStyle(Color.black)
-                                                    }
-                                                }
+                                                messageView(item: item, isMe: false)
                                                 Spacer()
                                             }
                                         }
-                                        .id(chat.id)
+                                        .id(item.id)
                                     }
                                 }
                             }
@@ -173,6 +184,9 @@ struct ChatView: View {
         }
         .onDisappear {
             listener?.remove()
+        }
+        .onAppear {
+            listenMaps(planId: plan.id)
         }
     }
     func colorcode(r:Int,g:Int,b:Int)-> Color{
@@ -324,6 +338,120 @@ struct ChatView: View {
                 } else {
                     completion("不明")
                 }
+            }
+    }
+    @ViewBuilder
+    func messageView(item: TimelineItem, isMe: Bool) -> some View {
+        VStack {
+
+            if item.type == .chat {
+
+                Text(item.chat ?? "")
+                    .padding(8)
+                    .font(.custom("KiwiMaru-Regular", size: 20))
+                    .background(
+                        isMe ?
+                        colorcode(r: 255, g: 162, b: 97)
+                        :
+                        colorcode(r: 127, g: 183, b: 126)
+                    )
+                    .cornerRadius(10)
+
+            } else {
+
+                VStack {
+                    Image(systemName: "map.fill")
+                        .font(.system(size: 30))
+
+                    Text("位置情報")
+                        .font(.caption)
+                }
+                .padding(8)
+                .background(
+                    isMe ?
+                    colorcode(r: 255, g: 162, b: 97)
+                    :
+                    colorcode(r: 127, g: 183, b: 126)
+                )
+                .cornerRadius(10)
+            }
+
+            Text(item.senderName)
+                .font(.custom("KiwiMaru-Regular", size: 12))
+        }
+        .padding(.horizontal, 30)
+    }
+    func makeTimelineItems(
+        chats: [ChatItem],
+        maps: [MapItem]
+    ) -> [TimelineItem] {
+
+        let chatItems = chats.map {
+            TimelineItem(
+                id: $0.id,
+                senderId: $0.senderId,
+                senderName: $0.senderName,
+                createdAt: $0.createdAt,
+                type: .chat,
+                chat: $0.chat,
+                lat: nil,
+                lng: nil
+            )
+        }
+
+        let mapItems = maps.map {
+            TimelineItem(
+                id: $0.id,
+                senderId: $0.senderId,
+                senderName: $0.senderName,
+                createdAt: $0.createdAt,
+                type: .map,
+                chat: nil,
+                lat: $0.lat,
+                lng: $0.lng
+            )
+        }
+
+        return (chatItems + mapItems)
+            .sorted { $0.createdAt < $1.createdAt }
+    }
+    func listenMaps(planId: String) {
+        let db = Firestore.firestore()
+        
+        db.collection("plans")
+            .document(planId)
+            .collection("maps")
+            .order(by: "createdAt")
+            .addSnapshotListener { snapshot, _ in
+                
+                guard let snapshot = snapshot else { return }
+                
+                var results: [MapItem] = []
+                
+                for doc in snapshot.documents {
+                    let data = doc.data()
+                    
+                    guard
+                        let lat = data["latitude"] as? Double,
+                        let lng = data["longitude"] as? Double,
+                        let senderId = data["senderId"] as? String,
+                        let senderName = data["senderName"] as? String,
+                        let timestamp = data["createdAt"] as? Timestamp
+                    else { continue }
+                    
+                    results.append(
+                        MapItem(
+                            id: doc.documentID,
+                            lat: lat,
+                            lng: lng,
+                            createdAt: timestamp.dateValue(),
+                            senderId: senderId,
+                            senderName: senderName
+                        )
+                    )
+                }
+                
+                self.maps = results
             }
     }
 }

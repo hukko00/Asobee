@@ -8,6 +8,7 @@ struct MapView: View {
     @State var MapStyle: MapStyle = .standard
     @State private var isShowChangeSheet = false
     @State var mapnumber: Int = 0
+    @State private var searchText: String = ""
 
     @State private var cameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
@@ -20,12 +21,46 @@ struct MapView: View {
 
     var body: some View {
         ZStack {
-
             Map(position: $cameraPosition)
                 .mapStyle(MapStyle)
                 .onMapCameraChange(frequency: .onEnd) { context in
                     centerCoordinate = context.region.center
                 }
+            VStack {
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(.gray)
+
+                    TextField("場所を検索", text: $searchText)
+                        .textFieldStyle(.plain)
+
+                    if !searchText.isEmpty {
+                        Button {
+                            searchText = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.gray)
+                        }
+                    }
+
+                    Button {
+                        searchPlaces()
+                        searchText = ""
+                    } label: {
+                        Image(systemName: "arrow.forward.circle.fill")
+                            .font(.system(size: 18))
+                            .foregroundStyle(.blue)
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .shadow(color: .black.opacity(0.08), radius: 8)
+                .padding(.horizontal)
+
+                Spacer()
+            }
 
             Image(systemName: "mappin")
                 .font(.system(size: 40))
@@ -70,6 +105,30 @@ struct MapView: View {
                 mapStyle: $MapStyle,
                 cameraPosition: $cameraPosition
             )
+        }
+    }
+    func searchPlaces() {
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = searchText
+        
+        let search = MKLocalSearch(request: request)
+        
+        search.start { response, error in
+            guard let item = response?.mapItems.first else { return }
+            
+            let coordinate = item.location.coordinate
+            
+            withAnimation {
+                cameraPosition = .region(
+                    MKCoordinateRegion(
+                        center: coordinate,
+                        span: MKCoordinateSpan(
+                            latitudeDelta: 0.01,
+                            longitudeDelta: 0.01
+                        )
+                    )
+                )
+            }
         }
     }
     func createMapData(latitude:Double,longitude:Double) {
