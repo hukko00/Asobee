@@ -1,14 +1,6 @@
 import SwiftUI
 import FirebaseFirestore
 
-//struct TimeItem: Identifiable {
-//    let id: String
-//    let departureTime: String
-//    let departureStation: String
-//    let arrivalTime: String
-//    let arrivalStation: String
-//}
-
 struct PlanDetailView: View {
     var plan: PlanItem
     
@@ -75,7 +67,6 @@ struct PlanDetailView: View {
 
         print("🚀 listenTimes開始 planId:", planId)
 
-        // フォーマッタは外で1回だけ
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
 
@@ -107,7 +98,6 @@ struct PlanDetailView: View {
                     print("📄 docID:", doc.documentID)
                     print("📄 data:", data)
                     
-                    // 🔥 型チェックしながら取得
                     guard let departureTimestamp = data["departureTime"] as? Timestamp,
                           let arrivalTimestamp = data["arrivalTime"] as? Timestamp,
                           let departureStation = data["departureStation"] as? String,

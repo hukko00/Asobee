@@ -92,7 +92,7 @@ struct AddPlanView: View {
         db.collection("plans").addDocument(data: planData) { error in
             if let error = error {
                 print("作成失敗: \(error)")
-                completion(error) // ← エラー返す
+                completion(error) 
             } else {
                 print("作成成功")
                 dismiss()

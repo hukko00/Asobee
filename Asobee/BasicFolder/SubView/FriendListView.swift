@@ -11,19 +11,51 @@ struct Friend: Identifiable {
 struct FriendListView: View {
     @State private var friends: [Friend] = []
 
-
     var body: some View {
-        Text("フレンド一覧")
-            .font(Font.largeTitle.bold())
-        List(friends) { friend in
-            Text(friend.name)
+        VStack(alignment: .leading, spacing: 12) {
+            
+            Text("フレンド一覧")
+                .font(.custom("KiwiMaru-Medium", size: 28))
+                .padding(.horizontal)
+                .padding(.top)
+
+            ScrollView {
+                VStack(spacing: 8) {
+                    ForEach(friends) { friend in
+                        HStack(spacing: 12) {
+                            
+                            Circle()
+                                .fill(Color.blue.opacity(0.2))
+                                .frame(width: 44, height: 44)
+                                .overlay(
+                                    Text(String(friend.name.prefix(1)))
+                                        .font(.custom("KiwiMaru-Medium", size: 18))
+                                )
+                            
+                            Text(friend.name)
+                                .font(.custom("KiwiMaru-Medium", size: 17))
+                            
+                            Spacer()
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(Color.white)
+                        )
+                        .padding(.horizontal)
+                    }
+                }
+                .padding(.top, 4)
+            }
         }
+        .background(Color(.systemGroupedBackground))
         .onAppear {
             fetchFriends { result in
                 friends = result
             }
         }
     }
+
     func fetchFriends(completion: @escaping ([Friend]) -> Void) {
         guard let myUid = Auth.auth().currentUser?.uid else {
             completion([])

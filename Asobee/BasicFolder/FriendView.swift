@@ -9,54 +9,100 @@ struct FriendView: View {
     @State private var friendStatus: String = ""
     
     var body: some View {
-        NavigationStack{
-            VStack {
-                Text("あなたのフレンドコード:\(myCode)")
-                    .font(.title3)
-                    .padding()
-                TextField("フレンドコードを入力してください", text: $inputCode)
-                    .padding(.horizontal, 50)
-                    .padding()
-                Button {
-                    getUserInfoFromFriendCode(friendCode: inputCode) { uid, name in
-                        if let uid = uid {
-                            print("UID:", uid)
-                            followUser(friendUid: uid)
-                            friendStatus = "フレンド申請できました！"
-                        } else {
-                            print("ユーザーが見つかりません")
-                            friendStatus = "コードが違います！入力されたコードを確認して下さい！"
-                        }
-                    }
-                } label: {
-                    Text("フレンド申請")
-                        .font(.title)
-                        .padding(15)
-                        .foregroundStyle(Color.white)
-                        .bold()
-                        .background(Color.blue)
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                }
-                Text(friendStatus)
-                    .font(.title3)
-                    .foregroundStyle(Color.red)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+        NavigationStack {
+            VStack(spacing: 0) {
+                
+                // カスタムヘッダー
+                HStack {
+                    Text("フレンド")
+                        .font(.custom("KiwiMaru-Medium", size: 30))
+                    
+                    Spacer()
+                    
                     NavigationLink {
                         FriendListView()
                     } label: {
                         Image(systemName: "list.bullet")
+                            .font(.title3)
+                            .foregroundStyle(Color.black)
                     }
                 }
+                .padding(.horizontal)
+                .padding(.top, 10)
+                .padding(.bottom, 8)
+                
+                VStack(spacing: 20) {
+                    
+                    VStack(spacing: 8) {
+                        Text("あなたのフレンドコード")
+                            .font(.custom("KiwiMaru-Medium", size: 16))
+                            .foregroundStyle(.gray)
+                        
+                        Text(myCode)
+                            .font(.custom("KiwiMaru-Medium", size: 26))
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .fill(Color.blue.opacity(0.1))
+                            )
+                    }
+                    .padding(.top)
+                    
+                    VStack(spacing: 12) {
+                        TextField("フレンドコードを入力してください", text: $inputCode)
+                            .font(.custom("KiwiMaru-Medium", size: 16))
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .fill(Color(.systemGray6))
+                            )
+                        
+                        Button {
+                            getUserInfoFromFriendCode(friendCode: inputCode) { uid, name in
+                                if let uid = uid {
+                                    followUser(friendUid: uid)
+                                    friendStatus = "フレンド申請できました！"
+                                } else {
+                                    friendStatus = "コードが違います！入力されたコードを確認して下さい！"
+                                }
+                            }
+                        } label: {
+                            Text("フレンド申請")
+                                .font(.custom("KiwiMaru-Medium", size: 18))
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .fill(Color.blue)
+                                )
+                        }
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color.white)
+                    )
+                    .padding(.horizontal)
+                    
+                    if !friendStatus.isEmpty {
+                        Text(friendStatus)
+                            .font(.custom("KiwiMaru-Medium", size: 15))
+                            .foregroundStyle(.red)
+                            .padding(.horizontal)
+                    }
+                    
+                    Spacer()
+                }
             }
+            .background(Color.white)
+            .toolbar(.hidden)
             .onAppear {
                 getMyFriendCode { code in
                     if let code = code {
-                        DispatchQueue.main.async {
-                            myCode = code
-                            myFriendCode = code
-                        }
+                        myCode = code
+                        myFriendCode = code
                     }
                 }
                 friendStatus = ""
@@ -64,7 +110,6 @@ struct FriendView: View {
         }
     }
     
-    // 🔹 friendCode → uid取得
     func getUserInfoFromFriendCode(friendCode: String, completion: @escaping (String?, String?) -> Void) {
         let db = Firestore.firestore()
         
