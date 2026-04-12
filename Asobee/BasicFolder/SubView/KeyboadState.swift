@@ -22,11 +22,15 @@ class KeyboardObserver: ObservableObject {
     }
 
     @objc func show() {
-        isVisible = true
+        DispatchQueue.main.async {
+            self.isVisible = true
+        }
     }
 
     @objc func hide() {
-        isVisible = false
+        DispatchQueue.main.async {
+            self.isVisible = false
+        }
     }
 }
 

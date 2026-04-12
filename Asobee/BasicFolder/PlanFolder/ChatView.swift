@@ -51,13 +51,14 @@ struct ChatView: View {
     @EnvironmentObject var tabBarState: TabBarState
     @Environment(\.dismiss) var dismiss
     @State private var showScrollButton = false
+    @State private var showPlusMenu = false
     
     var body: some View {
         NavigationStack{
             ZStack {
-                Color(colorcode(r: 247, g: 246, b: 242))//247, 246, 242
+                Color(colorcode(r: 247, g: 246, b: 242))
                     .ignoresSafeArea()
-                
+
                 VStack {
                     ZStack {
                         // タイトル（常に中央）
@@ -127,8 +128,10 @@ struct ChatView: View {
                     Spacer()
                     
                     HStack(spacing: 12) {
-                        NavigationLink{
-                            MapView(plan:plan)
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                showPlusMenu.toggle()
+                            }
                         } label:{
                             Image(systemName: "plus")
                                 .font(.custom("KiwiMaru-Regular", size: 22))
@@ -164,7 +167,26 @@ struct ChatView: View {
                     .padding(.horizontal, 16)
                     .padding(.bottom, 10)
                 }
+                if showPlusMenu {
+
+                    Color.black.opacity(0.2)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation {
+                                showPlusMenu = false
+                            }
+                        }
+
+                    VStack {
+                        Spacer()
+
+                        PlusButtonView()
+                            .padding(.bottom, 90)
+                    }
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
             }
+            .animation(.spring(response: 0.35, dampingFraction: 0.8), value: showPlusMenu)
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {

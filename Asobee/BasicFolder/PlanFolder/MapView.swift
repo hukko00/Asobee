@@ -33,6 +33,7 @@ struct MapView: View {
 
                     TextField("場所を検索", text: $searchText)
                         .textFieldStyle(.plain)
+                        .font(.custom("KiwiMaru-Regular", size: 24))
 
                     if !searchText.isEmpty {
                         Button {
@@ -40,6 +41,7 @@ struct MapView: View {
                         } label: {
                             Image(systemName: "xmark.circle.fill")
                                 .foregroundStyle(.gray)
+                                .font(.system(size: 24))
                         }
                     }
 
@@ -48,7 +50,7 @@ struct MapView: View {
                         searchText = ""
                     } label: {
                         Image(systemName: "arrow.forward.circle.fill")
-                            .font(.system(size: 18))
+                            .font(.system(size: 24))
                             .foregroundStyle(.blue)
                     }
                 }

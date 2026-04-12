@@ -96,7 +96,7 @@ struct AddPlanView: View {
             } else {
                 print("作成成功")
                 dismiss()
-                completion(nil) // ← 成功
+                completion(nil)
             }
         }
     }
