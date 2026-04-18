@@ -25,6 +25,12 @@ struct MapItem: Identifiable {
     let senderName: String
 }
 
+enum ItemType {
+    case chat
+    case map
+    case question   // ←追加
+}
+
 struct TimelineItem: Identifiable {
     let id: String
     let senderId: String
@@ -35,12 +41,19 @@ struct TimelineItem: Identifiable {
     let chat: String?
     let lat: Double?
     let lng: Double?
-    
-    enum ItemType {
-        case chat
-        case map
-    }
+    let title: String?
+    let choices: [String]?
 }
+
+struct QuestionItem: Identifiable {
+    let id: String
+    let title: String
+    let choices: [String]
+    let createdAt: Date
+    let senderId: String
+    let senderName: String
+}
+
 struct ChatView: View {
     var plan: PlanItem
     @State private var chats: [ChatItem] = []
@@ -52,154 +65,194 @@ struct ChatView: View {
     @Environment(\.dismiss) var dismiss
     @State private var showScrollButton = false
     @State private var showPlusMenu = false
+    @State private var navigationNumber = 0
+    @State private var questions: [QuestionItem] = []
     
     var body: some View {
-        NavigationStack{
-            ZStack {
-                Color(colorcode(r: 247, g: 246, b: 242))
-                    .ignoresSafeArea()
-
-                VStack {
-                    ZStack {
-                        // タイトル（常に中央）
-                        Text(plan.title)
-                            .font(.custom("KiwiMaru-Medium", size: 18))
+        ZStack {
+            Color(colorcode(r: 247, g: 246, b: 242))
+                .ignoresSafeArea()
+            
+            VStack {
+                ZStack {
+                    // タイトル（常に中央）
+                    Text(plan.title)
+                        .font(.custom("KiwiMaru-Medium", size: 18))
+                    
+                    HStack {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "chevron.left")
+                                .font(.custom("KiwiMaru-Regular", size: 22))
+                                .foregroundColor(colorcode(r: 255, g: 162, b: 97))
+                        }
                         
-                        HStack {
+                        Spacer()
+                    }
+                }
+                .padding(.horizontal, 20)
+                ScrollViewReader { proxy in
+                    ZStack(alignment: .bottomTrailing) {
+                        
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: 12) {
+                                
+                                let items = makeTimelineItems(
+                                    chats: chats,
+                                    maps: maps,
+                                    questions: questions
+                                )
+                                
+                                ForEach(items) { item in
+                                    HStack {
+                                        
+                                        if item.senderId == Auth.auth().currentUser?.uid ?? "" {
+                                            Spacer()
+                                            messageView(item: item, isMe: true)
+                                        } else {
+                                            messageView(item: item, isMe: false)
+                                            Spacer()
+                                        }
+                                    }
+                                    .padding(.horizontal, 8)
+                                    .id(item.id)
+                                }
+                            }
+                            .padding(.vertical, 10)
+                        }
+                        
+                        if showScrollButton {
                             Button {
-                                dismiss()
+                                let items = makeTimelineItems(
+                                    chats: chats,
+                                    maps: maps,
+                                    questions: questions
+                                )
+                                
+                                if let last = items.last {
+                                    withAnimation {
+                                        proxy.scrollTo(last.id, anchor: .bottom)
+                                    }
+                                }
+                                
+                                showScrollButton = false
                             } label: {
-                                Image(systemName: "chevron.left")
-                                    .font(.custom("KiwiMaru-Regular", size: 22))
-                                    .foregroundColor(colorcode(r: 255, g: 162, b: 97))
-                            }
-                            
-                            Spacer()
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    ScrollViewReader { proxy in
-                        ZStack(alignment: .bottomTrailing) {
-                            
-                            ScrollView {
-                                LazyVStack(alignment: .leading) {
-
-                                    let items = makeTimelineItems(
-                                        chats: chats,
-                                        maps: maps
+                                Image(systemName: "arrow.down.circle.fill")
+                                    .font(.system(size: 44))
+                                    .foregroundStyle(Color.gray.opacity(0.7))
+                                    .background(
+                                        Circle()
+                                            .fill(Color.white)
+                                            .shadow(radius: 4)
                                     )
-
-                                    ForEach(items) { item in
-                                        HStack {
-
-                                            if item.senderId == Auth.auth().currentUser?.uid ?? "" {
-                                                Spacer()
-                                                messageView(item: item, isMe: true)
-                                            } else {
-                                                messageView(item: item, isMe: false)
-                                                Spacer()
-                                            }
-                                        }
-                                        .id(item.id)
-                                    }
-                                }
                             }
-                            if showScrollButton {
-                                Button {
-                                    if let last = chats.last {
-                                        withAnimation {
-                                            proxy.scrollTo(last.id, anchor: .bottom)
-                                        }
-                                    }
-                                    showScrollButton = false
-                                } label: {
-                                    Image(systemName: "arrow.down.circle.fill")
-                                        .font(.system(size: 40))
-                                        .foregroundColor(.gray)
-                                        .opacity(0.5)
-                                        .padding()
-                                }
-                            }
-                        }
-                        .onChange(of: chats.count) {
-                            showScrollButton = true
+                            .padding(.trailing, 16)
+                            .padding(.bottom, 16)
                         }
                     }
+                    .onChange(of: chats.count) {
+                        showScrollButton = true
+                    }
+                }
+                Spacer()
+                
+                HStack(spacing: 10) {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            showPlusMenu.toggle()
+                        }
+                    } label:{
+                        Image(systemName: "plus")
+                            .font(.system(size: 20))
+                            .foregroundColor(colorcode(r: 127, g: 183, b: 126))
+                    }
+
+                    Button{
+                        
+                    } label:{
+                        Image(systemName: "photo")
+                            .font(.system(size: 20))
+                            .foregroundColor(colorcode(r: 127, g: 183, b: 126))
+                    }
+
+                    TextField("メッセージを入力", text: $text)
+                        .font(.custom("KiwiMaru-Regular", size: 18))
+                        .padding(10)
+                        .background(Color.white)
+                        .cornerRadius(10)
+
+                    Button{
+                        if !text.isEmpty {
+                            createChat(chat: text)
+                            text = ""
+                        }
+                    } label:{
+                        Image(systemName: "paperplane.fill")
+                            .font(.system(size: 20))
+                            .foregroundColor(colorcode(r: 255, g: 162, b: 97))
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(colorcode(r: 234, g: 231, b: 220))
+                )
+                .padding(.horizontal, 12)
+                .padding(.bottom, 10)
+            }
+            if showPlusMenu {
+                
+                Color.black.opacity(0.2)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation {
+                            showPlusMenu = false
+                        }
+                    }
+                
+                VStack {
                     Spacer()
                     
-                    HStack(spacing: 12) {
-                        Button {
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                showPlusMenu.toggle()
-                            }
-                        } label:{
-                            Image(systemName: "plus")
-                                .font(.custom("KiwiMaru-Regular", size: 22))
-                                .foregroundColor(colorcode(r: 127, g: 183, b: 126))
-                        }
-                        Button{
-                            
-                        } label:{
-                            Image(systemName: "photo")
-                                .font(.system(size: 22))
-                                .foregroundColor(colorcode(r: 127, g: 183, b: 126))
-                        }
-                        
-                        TextField("メッセージを入力", text: $text)
-                            .font(.custom("KiwiMaru-Regular", size: 20))
-                            .padding(10)
-                            .background(Color.white)
-                            .cornerRadius(12)
-                        Button{
-                            if !text.isEmpty {
-                                createChat(chat: text)
-                                text = ""
-                            }
-                        } label:{
-                            Image(systemName: "paperplane.fill")
-                                .foregroundColor(colorcode(r: 255, g: 162, b: 97))
-                                .font(.system(size: 22))
-                        }
+                    PlusButtonView { number in
+                        showPlusMenu = false
+                        navigationNumber = number
                     }
-                    .padding(12)
-                    .background(colorcode(r: 234, g: 231, b: 220))
-                    .cornerRadius(20)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 10)
+                    .padding(.bottom, 90)
                 }
-                if showPlusMenu {
-
-                    Color.black.opacity(0.2)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            withAnimation {
-                                showPlusMenu = false
-                            }
-                        }
-
-                    VStack {
-                        Spacer()
-
-                        PlusButtonView()
-                            .padding(.bottom, 90)
-                    }
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
-            .animation(.spring(response: 0.35, dampingFraction: 0.8), value: showPlusMenu)
+        }
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: showPlusMenu)
+        .navigationDestination(isPresented: Binding(
+            get: { navigationNumber != 0 },
+            set: { _ in navigationNumber = 0 }
+        )) {
+            
+            switch navigationNumber {
+            case 1:
+                QuestionnaireView(plan: plan)
+                
+            case 2:
+                ItineraryView()
+                
+            case 3:
+                MapView(plan: plan)
+                
+            case 4:
+                RouteView()
+                
+            default:
+                EmptyView()
+            }
         }
         .navigationBarBackButtonHidden(true)
+        
         .onAppear {
             listenChats(planId: plan.id) { result in
                 self.chats = result
             }
-        }
-        .onAppear {
-            tabBarState.isVisible = false
-        }
-        
-        .onDisappear {
-            tabBarState.isVisible = true
         }
         .onAppear {
             listenTimes(planId: plan.id)
@@ -209,6 +262,21 @@ struct ChatView: View {
         }
         .onAppear {
             listenMaps(planId: plan.id)
+        }
+        .onAppear {
+            listenQuestions(planId: plan.id)
+        }
+        .task {
+            tabBarState.isVisible = false
+            print("taskOK")
+        }
+        
+        .onDisappear{
+            tabBarState.isVisible = true
+            print("DisappearOK")
+        }
+        .onChange(of: tabBarState.isVisible) {
+            print("TabBar:", tabBarState.isVisible)
         }
     }
     func colorcode(r:Int,g:Int,b:Int)-> Color{
@@ -364,50 +432,73 @@ struct ChatView: View {
     }
     @ViewBuilder
     func messageView(item: TimelineItem, isMe: Bool) -> some View {
-        VStack {
-
+        VStack(alignment: isMe ? .trailing : .leading, spacing: 4) {
+            
             if item.type == .chat {
-
+                
                 Text(item.chat ?? "")
-                    .padding(8)
-                    .font(.custom("KiwiMaru-Regular", size: 20))
+                    .padding(12)
+                    .font(.custom("KiwiMaru-Regular", size: 18))
                     .background(
                         isMe ?
                         colorcode(r: 255, g: 162, b: 97)
                         :
-                        colorcode(r: 127, g: 183, b: 126)
+                            colorcode(r: 127, g: 183, b: 126)
                     )
-                    .cornerRadius(10)
-
-            } else {
-
-                VStack {
+                    .cornerRadius(14)
+                
+            } else if item.type == .map {
+                
+                VStack(spacing: 6) {
                     Image(systemName: "map.fill")
-                        .font(.system(size: 30))
-
+                        .font(.system(size: 26))
+                    
                     Text("位置情報")
                         .font(.caption)
                 }
-                .padding(8)
+                .padding(12)
                 .background(
                     isMe ?
                     colorcode(r: 255, g: 162, b: 97)
                     :
-                    colorcode(r: 127, g: 183, b: 126)
+                        colorcode(r: 127, g: 183, b: 126)
                 )
-                .cornerRadius(10)
+                .cornerRadius(14)
+                
+            } else if item.type == .question {
+                
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(item.title ?? "")
+                        .font(.custom("KiwiMaru-Regular", size: 18))
+                        .bold()
+                    
+                    ForEach(item.choices ?? [], id: \.self) { choice in
+                        Text("・\(choice)")
+                            .font(.custom("KiwiMaru-Regular", size: 16))
+                    }
+                }
+                .padding(12)
+                .background(
+                    isMe ?
+                    colorcode(r: 255, g: 162, b: 97)
+                    :
+                        colorcode(r: 127, g: 183, b: 126)
+                )
+                .cornerRadius(14)
             }
-
+            
             Text(item.senderName)
-                .font(.custom("KiwiMaru-Regular", size: 12))
+                .font(.custom("KiwiMaru-Regular", size: 11))
+                .foregroundColor(.gray)
         }
-        .padding(.horizontal, 30)
+        .padding(.horizontal, 16)
     }
     func makeTimelineItems(
         chats: [ChatItem],
-        maps: [MapItem]
+        maps: [MapItem],
+        questions: [QuestionItem]
     ) -> [TimelineItem] {
-
+        
         let chatItems = chats.map {
             TimelineItem(
                 id: $0.id,
@@ -417,10 +508,12 @@ struct ChatView: View {
                 type: .chat,
                 chat: $0.chat,
                 lat: nil,
-                lng: nil
+                lng: nil,
+                title: nil,
+                choices: nil
             )
         }
-
+        
         let mapItems = maps.map {
             TimelineItem(
                 id: $0.id,
@@ -430,11 +523,28 @@ struct ChatView: View {
                 type: .map,
                 chat: nil,
                 lat: $0.lat,
-                lng: $0.lng
+                lng: $0.lng,
+                title: nil,
+                choices: nil
             )
         }
-
-        return (chatItems + mapItems)
+        
+        let questionItems = questions.map {
+            TimelineItem(
+                id: $0.id,
+                senderId: $0.senderId,
+                senderName: $0.senderName,
+                createdAt: $0.createdAt,
+                type: .question,
+                chat: nil,
+                lat: nil,
+                lng: nil,
+                title: $0.title,
+                choices: $0.choices
+            )
+        }
+        
+        return (chatItems + mapItems + questionItems)
             .sorted { $0.createdAt < $1.createdAt }
     }
     func listenMaps(planId: String) {
@@ -474,6 +584,45 @@ struct ChatView: View {
                 }
                 
                 self.maps = results
+            }
+    }
+    func listenQuestions(planId: String) {
+        let db = Firestore.firestore()
+        
+        db.collection("plans")
+            .document(planId)
+            .collection("questions")
+            .order(by: "createdAt")
+            .addSnapshotListener { snapshot, _ in
+                
+                guard let snapshot = snapshot else { return }
+                
+                var results: [QuestionItem] = []
+                
+                for doc in snapshot.documents {
+                    let data = doc.data()
+                    
+                    guard
+                        let title = data["title"] as? String,
+                        let choices = data["choices"] as? [String],
+                        let senderId = data["senderId"] as? String,
+                        let senderName = data["senderName"] as? String,
+                        let timestamp = data["createdAt"] as? Timestamp
+                    else { continue }
+                    
+                    results.append(
+                        QuestionItem(
+                            id: doc.documentID,
+                            title: title,
+                            choices: choices,
+                            createdAt: timestamp.dateValue(),
+                            senderId: senderId,
+                            senderName: senderName
+                        )
+                    )
+                }
+                
+                self.questions = results
             }
     }
 }

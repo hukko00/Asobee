@@ -2,30 +2,34 @@
 import SwiftUI
 
 struct PlusButtonView: View {
-    @State var navigationnumber:Int = 0
+
+    var onSelect: (Int) -> Void
     var body: some View {
-        VStack(spacing :30){
-            HStack(spacing: 30){
-                Button{
-                    navigationnumber = 1
-                } label:{
+        VStack(spacing: 30) {
+            HStack(spacing: 30) {
+                Button {
+                    onSelect(1)
+                } label: {
                     ButtonBuilder(text: "アンケート", image: "text.document")
                 }
-                Button{
-                    navigationnumber = 2
-                } label:{
+
+                Button {
+                    onSelect(2)
+                } label: {
                     ButtonBuilder(text: "日程調整", image: "calendar")
                 }
             }
-            HStack(spacing: 30){
-                Button{
-                    navigationnumber = 3
-                } label:{
+
+            HStack(spacing: 30) {
+                Button {
+                    onSelect(3)
+                } label: {
                     ButtonBuilder(text: "マップ", image: "map")
                 }
-                Button{
-                    navigationnumber = 4
-                } label:{
+
+                Button {
+                    onSelect(4)
+                } label: {
                     ButtonBuilder(text: "乗り換え", image: "tram")
                 }
             }
@@ -50,6 +54,3 @@ struct PlusButtonView: View {
     }
 }
 
-#Preview {
-    PlusButtonView()
-}

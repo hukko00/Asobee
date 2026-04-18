@@ -17,68 +17,11 @@ struct PlanView: View {
     
     var body: some View {
         ZStack{
-            NavigationStack {
-                VStack{
-                    if plans.isEmpty {
-                        Text("プランがまだありません\nプランを追加して下さい")
-                            .foregroundStyle(Color.gray)
-                            .font(.title3.bold())
-                            .toolbar {
-                                NavigationLink {
-                                    AddPlanView()
-                                } label: {
-                                    Image(systemName: "plus")
-                                        .font(.title2)
-                                }
-                                .navigationBarBackButtonHidden(true)
-                            }
-                            .refreshable {
-                                fetchPlans()
-                            }
-                    } else{
-                        VStack{
-                            ScrollView {
-                                VStack(spacing: 12) {
-                                    ForEach(plans) { plan in
-                                        NavigationLink {
-                                            ChatView(plan: plan)
-                                        } label: {
-                                            VStack(alignment: .leading, spacing: 6) {
-                                                
-                                                Text(plan.title)
-                                                    .font(.custom("KiwiMaru-Medium", size: 20))
-                                                    .foregroundColor(.black)
-                                                
-                                                Text("owner: \(ownerNameCache[plan.ownerId] ?? ownerName)")
-                                                    .font(.custom("KiwiMaru-Light", size: 14))
-                                                    .foregroundColor(.gray)
-                                            }
-                                            .padding()
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .background(colorcode(r: 235, g: 225, b: 215))
-                                            .cornerRadius(16)
-                                            .shadow(color: .black.opacity(0.08), radius: 5, x: 0, y: 2)
-                                        }
-                                        .padding(.horizontal)
-                                        .onAppear {
-                                            if ownerNameCache[plan.ownerId] == nil {
-                                                fetchUserName(uid: plan.ownerId) { name in
-                                                    ownerNameCache[plan.ownerId] = name
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                .padding(.top)
-                            }
-                            .refreshable {
-                                fetchPlans()
-                            }
-                        }
-                        .scrollContentBackground(.hidden)
-                        .refreshable {
-                            fetchPlans()
-                        }
+            VStack{
+                if plans.isEmpty {
+                    Text("プランがまだありません\nプランを追加して下さい")
+                        .foregroundStyle(Color.gray)
+                        .font(.title3.bold())
                         .toolbar {
                             NavigationLink {
                                 AddPlanView()
@@ -86,6 +29,61 @@ struct PlanView: View {
                                 Image(systemName: "plus")
                                     .font(.title2)
                             }
+                            .navigationBarBackButtonHidden(true)
+                        }
+                        .refreshable {
+                            fetchPlans()
+                        }
+                } else{
+                    VStack{
+                        ScrollView {
+                            VStack(spacing: 12) {
+                                ForEach(plans) { plan in
+                                    NavigationLink {
+                                        ChatView(plan: plan)
+                                    } label: {
+                                        VStack(alignment: .leading, spacing: 6) {
+                                            
+                                            Text(plan.title)
+                                                .font(.custom("KiwiMaru-Medium", size: 20))
+                                                .foregroundColor(.black)
+                                            
+                                            Text("owner: \(ownerNameCache[plan.ownerId] ?? ownerName)")
+                                                .font(.custom("KiwiMaru-Light", size: 14))
+                                                .foregroundColor(.gray)
+                                        }
+                                        .padding()
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(colorcode(r: 235, g: 225, b: 215))
+                                        .cornerRadius(16)
+                                        .shadow(color: .black.opacity(0.08), radius: 5, x: 0, y: 2)
+                                    }
+                                    .padding(.horizontal)
+                                    .onAppear {
+                                        if ownerNameCache[plan.ownerId] == nil {
+                                            fetchUserName(uid: plan.ownerId) { name in
+                                                ownerNameCache[plan.ownerId] = name
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(.top)
+                        }
+                        .refreshable {
+                            fetchPlans()
+                        }
+                    }
+                    .scrollContentBackground(.hidden)
+                    .refreshable {
+                        fetchPlans()
+                    }
+                    .toolbar {
+                        NavigationLink {
+                            AddPlanView()
+                        } label: {
+                            Image(systemName: "plus")
+                                .font(.title2)
                         }
                     }
                 }

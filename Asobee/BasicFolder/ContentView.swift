@@ -9,19 +9,21 @@ struct ContentView: View {
         VStack(spacing: 0) {
             
             // メイン画面
-            Group {
-                if Viewnumber == 1 {
-                    ProfileView()
-                } else if Viewnumber == 2 {
-                    PlanView()
-                } else if Viewnumber == 3 {
-                    FriendView()
+            NavigationStack {
+                Group {
+                    if Viewnumber == 1 {
+                        ProfileView()
+                    } else if Viewnumber == 2 {
+                        PlanView()
+                    } else if Viewnumber == 3 {
+                        FriendView()
+                    }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             
             // タブバー
-            if tabBarState.isVisible {
+            if tabBarState.isVisible && Viewnumber == 2 {
                 HStack {
                     tabButton(icon: "airplane.up.forward", title: "プラン", index: 2)
                     tabButton(icon: "person.fill", title: "プロフィール", index: 1)
@@ -56,4 +58,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environmentObject(TabBarState())
 }

@@ -8,6 +8,7 @@ struct MapView: View {
     @State var MapStyle: MapStyle = .standard
     @State private var isShowChangeSheet = false
     @State var mapnumber: Int = 0
+    @EnvironmentObject var tabBarState: TabBarState
     @State private var searchText: String = ""
 
     @State private var cameraPosition: MapCameraPosition = .region(
@@ -100,6 +101,10 @@ struct MapView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 30)
             }
+        }
+        .onAppear {
+            tabBarState.isVisible = false
+            print("MapAppearOK")
         }
         .sheet(isPresented: $isShowChangeSheet){
             SheetView(
