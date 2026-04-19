@@ -11,6 +11,7 @@ struct QuestionnaireView: View {
     @State private var selected: String? = nil
     @State private var choices:[String] = [""]
     @State private var title:String = ""
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         ScrollView{
@@ -77,6 +78,7 @@ struct QuestionnaireView: View {
                 }
                 Button{
                     createQuestion(title: title, choices: choices)
+                    dismiss()
                 } label:{
                     HStack {
                         Image(systemName:"checkmark")

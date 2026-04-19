@@ -23,7 +23,7 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             
             // タブバー
-            if tabBarState.isVisible && Viewnumber == 2 {
+            if tabBarState.isVisible {
                 HStack {
                     tabButton(icon: "airplane.up.forward", title: "プラン", index: 2)
                     tabButton(icon: "person.fill", title: "プロフィール", index: 1)

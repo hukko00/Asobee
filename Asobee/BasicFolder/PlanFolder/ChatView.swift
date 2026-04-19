@@ -67,6 +67,8 @@ struct ChatView: View {
     @State private var showPlusMenu = false
     @State private var navigationNumber = 0
     @State private var questions: [QuestionItem] = []
+    @State private var selectedMap: MapItem? = nil
+    @State private var selectedQuestion: QuestionItem? = nil
     
     var body: some View {
         ZStack {
@@ -243,6 +245,18 @@ struct ChatView: View {
             case 4:
                 RouteView()
                 
+            case 5:
+                if let selectedMap {
+                    ShowMapView(map: selectedMap)
+                } else {
+                    Text("データなし")
+                }
+            case 6:
+                if let selectedMap {
+                    ShowMapView(map: selectedMap)
+                } else {
+                    Text("データなし")
+                }
             default:
                 EmptyView()
             }
@@ -449,42 +463,60 @@ struct ChatView: View {
                 
             } else if item.type == .map {
                 
-                VStack(spacing: 6) {
-                    Image(systemName: "map.fill")
-                        .font(.system(size: 26))
-                    
-                    Text("位置情報")
-                        .font(.caption)
-                }
-                .padding(12)
-                .background(
-                    isMe ?
-                    colorcode(r: 255, g: 162, b: 97)
-                    :
-                        colorcode(r: 127, g: 183, b: 126)
-                )
-                .cornerRadius(14)
-                
-            } else if item.type == .question {
-                
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(item.title ?? "")
-                        .font(.custom("KiwiMaru-Regular", size: 18))
-                        .bold()
-                    
-                    ForEach(item.choices ?? [], id: \.self) { choice in
-                        Text("・\(choice)")
-                            .font(.custom("KiwiMaru-Regular", size: 16))
+                Button {
+                    selectedMap = MapItem(
+                        id: item.id,
+                        lat: item.lat ?? 0,
+                        lng: item.lng ?? 0,
+                        createdAt: item.createdAt,
+                        senderId: item.senderId,
+                        senderName: item.senderName
+                    )
+                    navigationNumber = 5
+                } label: {
+                    VStack(spacing: 6) {
+                        Image(systemName: "map.fill")
+                            .font(.system(size: 26))
+                            .foregroundStyle(.black)
+
+                        Text("位置情報")
+                            .font(.custom("text.document", size: 18))
+                            .foregroundStyle(.black)
                     }
-                }
-                .padding(12)
-                .background(
-                    isMe ?
-                    colorcode(r: 255, g: 162, b: 97)
-                    :
+                    .padding(12)
+                    .background(
+                        isMe ?
+                        colorcode(r: 255, g: 162, b: 97)
+                        :
                         colorcode(r: 127, g: 183, b: 126)
-                )
-                .cornerRadius(14)
+                    )
+                    .cornerRadius(14)
+                }
+            }else if item.type == .question {
+                Button {
+                    
+                } label: {
+                    VStack(spacing: 6) {
+                        Text("アンケート")
+                            .font(.custom("KiwiMaru-Regular", size: 30))
+                            .foregroundStyle(.black)
+                        Image(systemName: "text.document")
+                            .font(.system(size: 26))
+                            .foregroundStyle(.black)
+
+                        Text(item.title ?? "")
+                            .font(.custom("KiwiMaru-Regular", size: 18))
+                            .foregroundStyle(.black)
+                    }
+                    .padding(12)
+                    .background(
+                        isMe ?
+                        colorcode(r: 255, g: 162, b: 97)
+                        :
+                        colorcode(r: 127, g: 183, b: 126)
+                    )
+                    .cornerRadius(14)
+                }
             }
             
             Text(item.senderName)
@@ -554,7 +586,7 @@ struct ChatView: View {
             .document(planId)
             .collection("maps")
             .order(by: "createdAt")
-            .addSnapshotListener { snapshot, _ in
+            .getDocuments { snapshot, _ in
                 
                 guard let snapshot = snapshot else { return }
                 
@@ -593,7 +625,7 @@ struct ChatView: View {
             .document(planId)
             .collection("questions")
             .order(by: "createdAt")
-            .addSnapshotListener { snapshot, _ in
+            .getDocuments { snapshot, _ in
                 
                 guard let snapshot = snapshot else { return }
                 

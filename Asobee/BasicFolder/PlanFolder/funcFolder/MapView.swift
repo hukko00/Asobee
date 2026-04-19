@@ -10,6 +10,7 @@ struct MapView: View {
     @State var mapnumber: Int = 0
     @EnvironmentObject var tabBarState: TabBarState
     @State private var searchText: String = ""
+    @Environment(\.dismiss) var dismiss
 
     @State private var cameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
@@ -76,6 +77,7 @@ struct MapView: View {
                 HStack {
                     Button {
                         createMapData(latitude: centerCoordinate.latitude, longitude: centerCoordinate.longitude)
+                        dismiss()
                     } label: {
                         Text("ここにする")
                             .font(Font.custom("KiwiMaru-Light",size:30))

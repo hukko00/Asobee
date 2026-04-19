@@ -10,10 +10,11 @@ struct PlanItem: Identifiable {
 }
 
 struct PlanView: View {
+    @StateObject var planviewmodel = PlanViewModel()
     @State private var plans: [PlanItem] = []
+    @State private var ownerNameCache: [String: String] = [:]
     @State private var userName: String = ""
     @State private var ownerName: String = "読み込み中..."
-    @State private var ownerNameCache: [String: String] = [:]
     
     var body: some View {
         ZStack{
@@ -90,7 +91,7 @@ struct PlanView: View {
             }
             .onAppear {
                 if plans.isEmpty {
-                    fetchMyPlans { result in
+                   fetchMyPlans { result in
                         plans = result
                     }
                 }
