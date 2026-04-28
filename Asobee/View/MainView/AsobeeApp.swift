@@ -15,11 +15,19 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct AsobeeApp: App {
     @StateObject private var tabBarState = TabBarState()
+    @StateObject var authVM = AuthViewModel()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(tabBarState)
+            if authVM.isLoggedIn {
+                ContentView()
+                    .environmentObject(authVM)
+                    .environmentObject(tabBarState) // ← これ追加
+            } else {
+                LoginVisionView()
+                    .environmentObject(authVM)
+                    .environmentObject(tabBarState) // ← これも追加
+            }
         }
     }
 }

@@ -8,6 +8,10 @@ struct Questions{
 }
 struct QuestionnaireView: View {
     var plan:PlanItem
+    var isValid: Bool {
+        !title.trimmingCharacters(in: .whitespaces).isEmpty &&
+        choices.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.count >= 2
+    }
     @State private var selected: String? = nil
     @State private var choices:[String] = [""]
     @State private var title:String = ""
@@ -42,7 +46,9 @@ struct QuestionnaireView: View {
                             )
                         
                         Button {
-                            choices.remove(at: index)
+                            if choices.count > 1 {
+                                choices.remove(at: index)
+                            }
                         } label: {
                             Image(systemName: "minus.circle.fill")
                                 .foregroundColor(.red)
@@ -99,6 +105,8 @@ struct QuestionnaireView: View {
                     )
                     .padding(.horizontal,20)
                 }
+                .disabled(!isValid)
+                .opacity(isValid ? 1 : 0.4)
             }
             .padding(.vertical,40)
         }

@@ -14,7 +14,9 @@ final class AuthViewModel: ObservableObject {
 
     init() {
         handle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
-            self?.isLoggedIn = (user != nil)
+            DispatchQueue.main.async {
+                self?.isLoggedIn = (user != nil)
+            }
         }
     }
 
@@ -25,10 +27,14 @@ final class AuthViewModel: ObservableObject {
     }
 
     func signUp(completion: @escaping (Bool) -> Void) {
+        errorMessage = ""
+
         Auth.auth().createUser(withEmail: email, password: password) { result, error in
             
             if let error = error {
-                print("登録失敗: \(error)")
+                DispatchQueue.main.async {
+                    self.errorMessage = error.localizedDescription
+                }
                 completion(false)
                 return
             }
@@ -43,13 +49,11 @@ final class AuthViewModel: ObservableObject {
             
             changeRequest.commitChanges { error in
                 if let error = error {
-                    print("プロフィール更新失敗: \(error)")
+                    DispatchQueue.main.async {
+                        self.errorMessage = error.localizedDescription
+                    }
                     completion(false)
                     return
-                }
-                
-                DispatchQueue.main.async {
-                    self.isLoggedIn = true
                 }
                 
                 completion(true)
@@ -58,22 +62,12 @@ final class AuthViewModel: ObservableObject {
     }
 
     func signIn() {
+        errorMessage = ""
+
         Auth.auth().signIn(withEmail: email, password: password) { result, error in
-            if let user = result?.user {
-
-                if user.displayName != self.username {
-                    do {
-                        try Auth.auth().signOut()
-                    } catch {}
-
-                    DispatchQueue.main.async {
-                        self.errorMessage = "ユーザー名が違います"
-                    }
-                    return
-                }
-
+            if let error = error {
                 DispatchQueue.main.async {
-                    self.isLoggedIn = true
+                    self.errorMessage = error.localizedDescription
                 }
             }
         }
@@ -89,4 +83,3 @@ final class AuthViewModel: ObservableObject {
         }
     }
 }
-

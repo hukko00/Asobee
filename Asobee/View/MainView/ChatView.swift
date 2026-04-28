@@ -265,7 +265,7 @@ struct ChatView: View {
                             .foregroundStyle(.black)
 
                         Text("位置情報")
-                            .font(.custom("text.document", size: 18))
+                            .font(.custom("KiwiMaru-Regular", size: 18))
                             .foregroundStyle(.black)
                     }
                     .padding(12)
@@ -286,7 +286,7 @@ struct ChatView: View {
                             .font(.custom("KiwiMaru-Regular", size: 30))
                             .foregroundStyle(.black)
                         Image(systemName: "text.document")
-                            .font(.system(size: 26))
+                            .font(.custom("KiwiMaru-Regular", size: 26))
                             .foregroundStyle(.black)
 
                         Text(item.title ?? "")
