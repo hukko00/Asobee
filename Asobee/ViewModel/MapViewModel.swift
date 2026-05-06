@@ -66,6 +66,10 @@ class mapviewModel:ObservableObject{
         }
     }
     func fetchlocalsearch(){
+        guard let apiKey = Bundle.main.object(forInfoDictionaryKey: "LOCALMAP_API_KEY") as? String else {
+            print("APIキー取得失敗")
+            return
+        }
         guard let url = URL(string: "https://map.yahooapis.jp/search/local/V1/localSearch") else {
             print("URLが不正です")
             return
