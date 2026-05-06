@@ -46,6 +46,7 @@ struct ContentView: View {
             withAnimation(.easeInOut) {
                 viewNumber = index
             }
+            print(ObjectIdentifier(tabBarState))
         } label: {
             VStack(spacing: 6) {
                 Image(systemName: icon)

@@ -11,6 +11,7 @@ struct PlanItem: Identifiable {
 
 struct PlanView: View {
     @StateObject var planviewmodel = PlanListViewModel()
+    @EnvironmentObject var tabBarState: TabBarState
     
     var body: some View {
         ZStack {
@@ -115,6 +116,10 @@ struct PlanView: View {
                     .padding(.bottom, 20)
                 }
             }
+        }
+        .onAppear {
+            tabBarState.isVisible = true
+            print("taskOK")
         }
         .onAppear {
             planviewmodel.fetchMyPlans()

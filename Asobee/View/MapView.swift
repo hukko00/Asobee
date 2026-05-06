@@ -5,41 +5,27 @@ import MapKit
 
 struct MapView: View {
     var plan: PlanItem
-    @State var MapStyle: MapStyle = .standard
-    @State private var isShowChangeSheet = false
-    @State var mapnumber: Int = 0
-    @EnvironmentObject var tabBarState: TabBarState
-    @State private var searchText: String = ""
     @Environment(\.dismiss) var dismiss
-
-    @State private var cameraPosition: MapCameraPosition = .region(
-        MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 35, longitude: 135),
-            span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
-        )
-    )
-
-    @State private var centerCoordinate: CLLocationCoordinate2D = .init()
-
+    @StateObject private var vm = mapviewModel()
     var body: some View {
         ZStack {
-            Map(position: $cameraPosition)
-                .mapStyle(MapStyle)
+            Map(position: $vm.cameraPosition)
+                .mapStyle(vm.MapStyle)
                 .onMapCameraChange(frequency: .onEnd) { context in
-                    centerCoordinate = context.region.center
+                    self.vm.centerCoordinate = context.region.center
                 }
             VStack {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(.gray)
 
-                    TextField("場所を検索", text: $searchText)
+                    TextField("場所を検索", text: $vm.searchText)
                         .textFieldStyle(.plain)
                         .font(.custom("KiwiMaru-Regular", size: 24))
 
-                    if !searchText.isEmpty {
+                    if !vm.searchText.isEmpty {
                         Button {
-                            searchText = ""
+                            vm.searchText = ""
                         } label: {
                             Image(systemName: "xmark.circle.fill")
                                 .foregroundStyle(.gray)
@@ -48,8 +34,8 @@ struct MapView: View {
                     }
 
                     Button {
-                        searchPlaces()
-                        searchText = ""
+                        vm.searchPlaces()
+                        vm.searchText = ""
                     } label: {
                         Image(systemName: "arrow.forward.circle.fill")
                             .font(.system(size: 24))
@@ -76,7 +62,7 @@ struct MapView: View {
                 
                 HStack {
                     Button {
-                        createMapData(latitude: centerCoordinate.latitude, longitude: centerCoordinate.longitude)
+                        vm.createMapData(latitude: vm.centerCoordinate.latitude, longitude: vm.centerCoordinate.longitude, id: plan.id)
                         dismiss()
                     } label: {
                         Text("ここにする")
@@ -89,7 +75,7 @@ struct MapView: View {
                     }
                     
                     Button {
-                        isShowChangeSheet = true
+                        vm.isShowChangeSheet = true
                     } label: {
                         Image(systemName: "map")
                             .font(.system(size: 24))
@@ -104,61 +90,12 @@ struct MapView: View {
                 .padding(.bottom, 30)
             }
         }
-        .onAppear {
-            tabBarState.isVisible = false
-            print("MapAppearOK")
-        }
-        .sheet(isPresented: $isShowChangeSheet){
+        .sheet(isPresented: $vm.isShowChangeSheet){
             SheetView(
-                mapnumber: $mapnumber,
-                mapStyle: $MapStyle,
-                cameraPosition: $cameraPosition
+                mapnumber: $vm.mapnumber,
+                mapStyle: $vm.MapStyle,
+                cameraPosition: $vm.cameraPosition
             )
-        }
-    }
-    func searchPlaces() {
-        let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = searchText
-        
-        let search = MKLocalSearch(request: request)
-        
-        search.start { response, error in
-            guard let item = response?.mapItems.first else { return }
-            
-            let coordinate = item.location.coordinate
-            
-            withAnimation {
-                cameraPosition = .region(
-                    MKCoordinateRegion(
-                        center: coordinate,
-                        span: MKCoordinateSpan(
-                            latitudeDelta: 0.01,
-                            longitudeDelta: 0.01
-                        )
-                    )
-                )
-            }
-        }
-    }
-    func createMapData(latitude:Double,longitude:Double) {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        
-        let db = Firestore.firestore()
-        
-        db.collection("users").document(uid).getDocument { snapshot, _ in
-            
-            let name = snapshot?.data()?["userName"] as? String ?? "不明"
-            
-            db.collection("plans")
-                .document(plan.id)
-                .collection("maps")
-                .addDocument(data: [
-                    "latitude":latitude,
-                    "longitude":longitude,
-                    "createdAt": Timestamp(date: Date()),
-                    "senderId": uid,
-                    "senderName": name
-                ])
         }
     }
 }

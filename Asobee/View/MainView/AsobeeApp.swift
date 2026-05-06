@@ -22,11 +22,11 @@ struct AsobeeApp: App {
             if authVM.isLoggedIn {
                 ContentView()
                     .environmentObject(authVM)
-                    .environmentObject(tabBarState) // ← これ追加
+                    .environmentObject(tabBarState) 
             } else {
                 LoginVisionView()
                     .environmentObject(authVM)
-                    .environmentObject(tabBarState) // ← これも追加
+                    .environmentObject(tabBarState)
             }
         }
     }

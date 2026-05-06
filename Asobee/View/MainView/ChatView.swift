@@ -213,15 +213,15 @@ struct ChatView: View {
             chatviewModel.stop()
         }
         .navigationBarBackButtonHidden(true)
-        .task {
+        .onAppear {
             tabBarState.isVisible = false
             print("taskOK")
         }
         
-        .onDisappear{
-            tabBarState.isVisible = true
-            print("DisappearOK")
-        }
+//        .onDisappear{
+//            tabBarState.isVisible = true
+//            print("DisappearOK")
+//        }
         .onChange(of: tabBarState.isVisible) {
             print("TabBar:", tabBarState.isVisible)
         }
