@@ -9,20 +9,26 @@ struct MapView: View {
     @StateObject private var vm = mapviewModel()
     var body: some View {
         ZStack {
-            Map(position: $vm.cameraPosition)
-                .mapStyle(vm.MapStyle)
-                .onMapCameraChange(frequency: .onEnd) { context in
-                    self.vm.centerCoordinate = context.region.center
+            Map(position: $vm.cameraPosition) {
+                ForEach(vm.mapItems) { item in
+                    Marker(
+                        item.senderName,
+                        coordinate: CLLocationCoordinate2D(
+                            latitude: item.lat,
+                            longitude: item.lng
+                        )
+                    )
                 }
+            }
             VStack {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(.gray)
-
+                    
                     TextField("場所を検索", text: $vm.searchText)
                         .textFieldStyle(.plain)
                         .font(.custom("KiwiMaru-Regular", size: 24))
-
+                    
                     if !vm.searchText.isEmpty {
                         Button {
                             vm.searchText = ""
@@ -32,10 +38,21 @@ struct MapView: View {
                                 .font(.system(size: 24))
                         }
                     }
-
+                    
                     Button {
-                        vm.searchPlaces()
-                        vm.searchText = ""
+                        Task {
+
+                            guard let region = vm.cameraPosition.region else { return }
+
+                            let lat = region.center.latitude
+                            let lon = region.center.longitude
+
+                            await vm.fetchLocalSearch(
+                                query: vm.searchText,
+                                latitude: lat,
+                                longitude: lon
+                            )
+                        }
                     } label: {
                         Image(systemName: "arrow.forward.circle.fill")
                             .font(.system(size: 24))
@@ -48,31 +65,19 @@ struct MapView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14))
                 .shadow(color: .black.opacity(0.08), radius: 8)
                 .padding(.horizontal)
-
+                
                 Spacer()
             }
-
+            
             Image(systemName: "mappin")
                 .font(.system(size: 40))
                 .foregroundColor(.red)
                 .offset(y: -20)
-
+            
             VStack {
                 Spacer()
                 
                 HStack {
-                    Button {
-                        vm.createMapData(latitude: vm.centerCoordinate.latitude, longitude: vm.centerCoordinate.longitude, id: plan.id)
-                        dismiss()
-                    } label: {
-                        Text("ここにする")
-                            .font(Font.custom("KiwiMaru-Light",size:30))
-                            .foregroundColor(.white)
-                            .padding(.vertical, 12)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue)
-                            .cornerRadius(12)
-                    }
                     
                     Button {
                         vm.isShowChangeSheet = true
@@ -104,7 +109,7 @@ struct SheetView: View {
     @Binding var mapnumber: Int
     @Binding var mapStyle: MapStyle
     @Binding var cameraPosition: MapCameraPosition
-
+    
     var body: some View {
         HStack(spacing: 16) {
             VStack(spacing:5){
@@ -122,7 +127,7 @@ struct SheetView: View {
                     .font(.custom("KiwiMaru-Light", size: 20))
                     .foregroundStyle(Color.black)
             }
-
+            
             Button{
                 mapStyle = .hybrid
             } label:{

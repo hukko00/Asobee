@@ -5,7 +5,21 @@ import FirebaseFirestore
 import SwiftUI
 internal import Combine
 import FirebaseAuth
+struct LocalSearchResponse: Codable {
+    let Feature: [Feature]?
+}
+
+struct Feature: Codable {
+    let Name: String
+    let Geometry: Geometry
+}
+
+struct Geometry: Codable {
+    let Coordinates: String
+}
 class mapviewModel:ObservableObject{
+    
+    @Published var mapItems: [MapItem] = []
     @Published var MapStyle: MapStyle = .standard
     @Published var isShowChangeSheet = false
     @Published var mapnumber: Int = 0
@@ -18,7 +32,8 @@ class mapviewModel:ObservableObject{
         )
     )
 
-    @Published var centerCoordinate: CLLocationCoordinate2D = .init()
+    @Published var centerCoordinate: CLLocationCoordinate2D =
+        CLLocationCoordinate2D(latitude: 35.170915, longitude: 136.881537)
 
     func searchPlaces() {
         let request = MKLocalSearch.Request()
@@ -44,35 +59,92 @@ class mapviewModel:ObservableObject{
             }
         }
     }
-    func createMapData(latitude:Double,longitude:Double,id:String) {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
+    func fetchLocalSearch(
+        query: String,
+        latitude: Double,
+        longitude: Double,
+//        gc: String = "0115001"
+    ) async {
         
-        let db = Firestore.firestore()
-        
-        db.collection("users").document(uid).getDocument { snapshot, _ in
-            
-            let name = snapshot?.data()?["userName"] as? String ?? "不明"
-            
-            db.collection("plans")
-                .document(id)
-                .collection("maps")
-                .addDocument(data: [
-                    "latitude":latitude,
-                    "longitude":longitude,
-                    "createdAt": Timestamp(date: Date()),
-                    "senderId": uid,
-                    "senderName": name
-                ])
-        }
-    }
-    func fetchlocalsearch(){
-        guard let apiKey = Bundle.main.object(forInfoDictionaryKey: "LOCALMAP_API_KEY") as? String else {
+        print("==== API START ====")
+        print("query:", query)
+        print("lat:", latitude, "lon:", longitude)
+
+        guard let apiKey = Bundle.main.object(forInfoDictionaryKey: "LOCALMAP_API_KEY") as? String,
+              !apiKey.isEmpty else {
             print("APIキー取得失敗")
             return
         }
-        guard let url = URL(string: "https://map.yahooapis.jp/search/local/V1/localSearch") else {
-            print("URLが不正です")
+
+        var components = URLComponents(string: "https://map.yahooapis.jp/search/local/V1/localSearch")
+        components?.queryItems = [
+            URLQueryItem(name: "appid", value: apiKey),
+            URLQueryItem(name: "lat", value: String(latitude)),
+            URLQueryItem(name: "lon", value: String(longitude)),
+            URLQueryItem(name: "query", value: query),
+//            URLQueryItem(name: "gc", value: gc),
+            URLQueryItem(name: "output", value: "json")
+        ]
+        
+
+        guard let url = components?.url else {
+            print("URL作成失敗")
             return
+        }
+
+        print("URL:", url.absoluteString)
+
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+
+            // ステータス確認
+            if let http = response as? HTTPURLResponse {
+                print("status:", http.statusCode)
+            }
+
+            // 生JSON確認（これ超重要）
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("==== RAW JSON ====")
+                print(jsonString)
+            }
+
+            // デコード
+            let decoded = try JSONDecoder().decode(LocalSearchResponse.self, from: data)
+
+            let features = decoded.Feature ?? []
+            print("取得件数:", features.count)
+
+            let items = features.compactMap { f -> MapItem? in
+                let parts = f.Geometry.Coordinates.split(separator: ",")
+
+                guard parts.count == 2,
+                      let lon = Double(parts[0]),
+                      let lat = Double(parts[1]) else {
+                    print("座標変換失敗:", f.Geometry.Coordinates)
+                    return nil
+                }
+
+                print("→", f.Name, lat, lon)
+
+                return MapItem(
+                    id: UUID().uuidString,
+                    lat: lat,
+                    lng: lon,
+                    createdAt: Date(),
+                    senderId: "api",
+                    senderName: f.Name
+                )
+            }
+
+            await MainActor.run {
+                self.mapItems = items
+            }
+
+            print("API END")
+
+        } catch {
+            print("エラー:", error)
         }
     }
 }
+

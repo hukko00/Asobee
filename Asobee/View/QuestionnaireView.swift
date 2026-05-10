@@ -33,7 +33,6 @@ struct QuestionnaireView: View {
                     )
                     .padding(.horizontal, 20)
                 
-                // 選択肢
                 ForEach(choices.indices, id: \.self) { index in
                     HStack(spacing: 10) {
                         
