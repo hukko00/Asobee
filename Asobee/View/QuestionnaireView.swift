@@ -18,96 +18,75 @@ struct QuestionnaireView: View {
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        ScrollView{
-            VStack(spacing: 20) {
-                TextField("タイトル", text: $title)
-                    .font(.custom("KiwiMaru-Regular", size: 25))
-                    .padding(14)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(Color.white)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(Color.gray.opacity(0.2))
-                    )
-                    .padding(.horizontal, 20)
-                
-                ForEach(choices.indices, id: \.self) { index in
-                    HStack(spacing: 10) {
-                        
-                        TextField("選択肢\(index + 1)", text: $choices[index])
-                            .font(.custom("KiwiMaru-Regular", size: 21))
-                            .padding(12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.white)
-                            )
-                        
-                        Button {
-                            if choices.count > 1 {
-                                choices.remove(at: index)
+        ZStack {
+            Color(.systemGroupedBackground)
+                .ignoresSafeArea()
+
+            ScrollView {
+                VStack(spacing: 24) {
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("アンケート作成")
+                            .font(.title.bold())
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+
+                    TextField("タイトル", text: $title)
+                        .padding()
+                        .background(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: .black.opacity(0.05), radius: 5)
+
+                    ForEach(choices.indices, id: \.self) { index in
+                        HStack {
+
+                            TextField("選択肢\(index + 1)", text: $choices[index])
+
+                            Button {
+                                if choices.count > 1 {
+                                    choices.remove(at: index)
+                                }
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundStyle(.red)
                             }
-                        } label: {
-                            Image(systemName: "minus.circle.fill")
-                                .foregroundColor(.red)
-                                .font(.system(size: 20))
                         }
+                        .padding()
+                        .background(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: .black.opacity(0.05), radius: 5)
                     }
-                    .padding(.horizontal, 20)
-                }
-                
-                Button{
-                    choices.append("")
-                } label:{
-                    HStack {
-                        Image(systemName:"plus")
-                            .foregroundStyle(Color.black)
-                        
-                        Text("選択肢を追加")
-                            .font(.custom("KiwiMaru-Regular", size: 20))
-                            .foregroundColor(.black)
-                        
-                        Spacer()
+
+                    Button {
+                        withAnimation {
+                            choices.append("")
+                        }
+                    } label: {
+                        Label("選択肢を追加", systemImage: "plus")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
                     }
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.2))
-                    )
-                    .padding(.horizontal,20)
-                }
-                Button{
-                    createQuestion(title: title, choices: choices)
-                    dismiss()
-                } label:{
-                    HStack {
-                        Image(systemName:"checkmark")
-                            .foregroundStyle(Color.black)
-                        
-                        Text("確定")
-                            .font(.custom("KiwiMaru-Regular", size: 20))
-                            .foregroundColor(.black)
+
+                    Button {
+                        createQuestion(title: title, choices: choices)
+                        dismiss()
+                    } label: {
+                        Text("作成する")
+                            .fontWeight(.bold)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(isValid ? Color.blue : Color.gray)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
                     }
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.2))
-                    )
-                    .padding(.horizontal,20)
+                    .disabled(!isValid)
+
                 }
-                .disabled(!isValid)
-                .opacity(isValid ? 1 : 0.4)
+                .padding()
             }
-            .padding(.vertical,40)
         }
     }
     func createQuestion(title:String,choices:[String]) {

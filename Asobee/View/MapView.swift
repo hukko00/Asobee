@@ -41,16 +41,10 @@ struct MapView: View {
                     
                     Button {
                         Task {
-
-                            guard let region = vm.cameraPosition.region else { return }
-
-                            let lat = region.center.latitude
-                            let lon = region.center.longitude
-
                             await vm.fetchLocalSearch(
                                 query: vm.searchText,
-                                latitude: lat,
-                                longitude: lon
+                                latitude: 35.681236,
+                                longitude: 139.767125
                             )
                         }
                     } label: {

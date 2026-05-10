@@ -1,11 +1,12 @@
 import SwiftUI
 import FirebaseFirestore
 import FirebaseAuth
-
+import SwiftData
 struct ChatView: View {
     var plan: PlanItem
     @State private var listener: ListenerRegistration?
     @State var text: String = ""
+    @Environment(\.modelContext) var context
     @EnvironmentObject var tabBarState: TabBarState
     @Environment(\.dismiss) var dismiss
     @State private var showScrollButton = false
@@ -182,7 +183,7 @@ struct ChatView: View {
                 QuestionnaireView(plan: plan)
                 
             case 2:
-                ItineraryView()
+                FinPlan()
                 
             case 3:
                 MapView(plan: plan)
@@ -207,6 +208,7 @@ struct ChatView: View {
             }
         }
         .onAppear {
+            chatviewModel.context = context
             chatviewModel.start(planId: plan.id)
         }
         .onDisappear {
@@ -214,14 +216,12 @@ struct ChatView: View {
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
+            chatviewModel.enableSwipeBack()
+        }
+        .onAppear {
             tabBarState.isVisible = false
             print("taskOK")
         }
-        
-//        .onDisappear{
-//            tabBarState.isVisible = true
-//            print("DisappearOK")
-//        }
         .onChange(of: tabBarState.isVisible) {
             print("TabBar:", tabBarState.isVisible)
         }

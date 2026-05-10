@@ -22,11 +22,13 @@ struct AsobeeApp: App {
             if authVM.isLoggedIn {
                 ContentView()
                     .environmentObject(authVM)
-                    .environmentObject(tabBarState) 
+                    .environmentObject(tabBarState)
+                    .modelContainer(for: CachedChatMessage.self)
             } else {
                 LoginVisionView()
                     .environmentObject(authVM)
                     .environmentObject(tabBarState)
+                    .modelContainer(for: CachedChatMessage.self)
             }
         }
     }

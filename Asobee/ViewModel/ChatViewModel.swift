@@ -2,6 +2,7 @@ import Foundation
 internal import Combine
 import FirebaseFirestore
 import FirebaseAuth
+import SwiftData
 
 struct TimeItem: Identifiable {
     let id: String
@@ -61,6 +62,7 @@ class chatviewmodel:ObservableObject{
     @Published var maps: [MapItem] = []
     @Published var questions: [QuestionItem] = []
     private var listeners: [ListenerRegistration] = []
+    var context: ModelContext?
     func listenTimes(planId: String) {
         let db = Firestore.firestore()
         let formatter = DateFormatter()
@@ -113,6 +115,9 @@ class chatviewmodel:ObservableObject{
         listeners.append(listener)
     }
     func listenChats(planId: String) {
+
+        guard let context = context else { return }
+
         let db = Firestore.firestore()
 
         let listener = db.collection("plans")
@@ -120,30 +125,61 @@ class chatviewmodel:ObservableObject{
             .collection("messages")
             .order(by: "createdAt")
             .addSnapshotListener { [weak self] snapshot, error in
-                
+
                 guard let documents = snapshot?.documents else { return }
 
-                let chats = documents.compactMap { doc -> ChatItem? in
+                var results: [ChatItem] = []
+
+                for doc in documents {
+
                     let data = doc.data()
-                    
-                    guard let chat = data["chat"] as? String,
-                          let timestamp = data["createdAt"] as? Timestamp,
-                          let senderId = data["senderId"] as? String,
-                          let senderName = data["senderName"] as? String else {
-                        return nil
+
+                    guard
+                        let chat = data["chat"] as? String,
+                        let timestamp = data["createdAt"] as? Timestamp,
+                        let senderId = data["senderId"] as? String,
+                        let senderName = data["senderName"] as? String
+                    else {
+                        continue
                     }
 
-                    return ChatItem(
+                    let item = ChatItem(
                         id: doc.documentID,
                         chat: chat,
                         createdAt: timestamp.dateValue(),
                         senderId: senderId,
                         senderName: senderName
                     )
+
+                    results.append(item)
+                    let docID = doc.documentID
+                    // 既存チェック
+                    let descriptor = FetchDescriptor<CachedChatMessage>(
+                        predicate: #Predicate {
+                            $0.id == docID
+                        }
+                    )
+
+                    let existing = try? context.fetch(descriptor)
+
+                    if existing?.isEmpty == true {
+
+                        let cached = CachedChatMessage(
+                            id: doc.documentID,
+                            text: chat,
+                            senderId: senderId,
+                            senderName: senderName,
+                            createdAt: timestamp.dateValue()
+                        )
+
+                        context.insert(cached)
+                    }
                 }
 
+                try? context.save()
+
                 DispatchQueue.main.async {
-                    self?.chats = chats
+                    self?.chats = results
                 }
             }
 
@@ -325,5 +361,12 @@ class chatviewmodel:ObservableObject{
     func stop() {
         listeners.forEach { $0.remove() }
         listeners.removeAll()
+    }
+    func enableSwipeBack() {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let navigationController = scene.windows.first?.rootViewController as? UINavigationController
+        else { return }
+
+        navigationController.interactivePopGestureRecognizer?.isEnabled = true
     }
 }
