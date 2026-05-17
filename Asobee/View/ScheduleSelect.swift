@@ -1,11 +1,11 @@
 import SwiftUI
 
-struct FinPlan: View {
+struct ScheduleSelect: View {
     var body: some View {
         
     }
 }
 
 #Preview {
-    FinPlan()
+    ScheduleSelect()
 }

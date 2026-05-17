@@ -10,6 +10,7 @@ struct MapView: View {
     var body: some View {
         ZStack {
             Map(position: $vm.cameraPosition) {
+
                 ForEach(vm.mapItems) { item in
                     Marker(
                         item.senderName,
@@ -19,6 +20,11 @@ struct MapView: View {
                         )
                     )
                 }
+            }
+            .onMapCameraChange { context in
+                vm.centerCoordinate = context.region.center
+                print(context.region.center.latitude)
+                print(context.region.center.longitude)
             }
             VStack {
                 HStack(spacing: 8) {
@@ -40,14 +46,22 @@ struct MapView: View {
                     }
                     
                     Button {
-                        Task {
-                            await vm.fetchLocalSearch(
-                                query: vm.searchText,
-                                latitude: 35.681236,
-                                longitude: 139.767125
-                            )
-                        }
+                        let lat = vm.centerCoordinate.latitude
+                            let lon = vm.centerCoordinate.longitude
+
+                            print(lat)
+                            print(lon)
+
+                            Task {
+
+                                await vm.fetchLocalSearch(
+                                    query: vm.searchText,
+                                    latitude: lat,
+                                    longitude: lon
+                                )
+                            }
                     } label: {
+
                         Image(systemName: "arrow.forward.circle.fill")
                             .font(.system(size: 24))
                             .foregroundStyle(.blue)
@@ -61,6 +75,9 @@ struct MapView: View {
                 .padding(.horizontal)
                 
                 Spacer()
+            }
+            ForEach(vm.mapItems){ item in
+                
             }
             
             Image(systemName: "mappin")

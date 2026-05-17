@@ -10,7 +10,7 @@ struct PlusButtonView: View {
                 Button {
                     onSelect(1)
                 } label: {
-                    ButtonBuilder(text: "アンケート", image: "text.document")
+                    ButtonBuilder(text: "アンケート", image: "questionmark.message")
                 }
 
                 Button {
@@ -30,7 +30,7 @@ struct PlusButtonView: View {
                 Button {
                     onSelect(4)
                 } label: {
-                    ButtonBuilder(text: "予定", image: "text.document")
+                    ButtonBuilder(text: "しおり", image: "text.document")
                 }
             }
         }

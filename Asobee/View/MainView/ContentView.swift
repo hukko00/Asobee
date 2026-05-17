@@ -30,17 +30,15 @@ struct ContentView: View {
                     tabButton(icon: "person.fill", title: "プロフィール", index: 1)
                 }
                 .padding(.vertical, 6)
-                .background(.ultraThinMaterial) // ここ変更
+                .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .padding(.horizontal)
                 .padding(.bottom, 8)
                 .shadow(radius: 5)
             }
         }
-        .ignoresSafeArea(.keyboard) // キーボード対策
+        .ignoresSafeArea(.keyboard)
     }
-    
-    // タブボタン
     func tabButton(icon: String, title: String, index: Int) -> some View {
         Button {
             withAnimation(.easeInOut) {

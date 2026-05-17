@@ -172,6 +172,7 @@ struct ChatView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: showPlusMenu)
         .navigationDestination(isPresented: Binding(
             get: { navigationNumber != 0 },
@@ -183,15 +184,16 @@ struct ChatView: View {
                 QuestionnaireView(plan: plan)
                 
             case 2:
-                FinPlan()
+                ScheduleSelect()
                 
             case 3:
                 MapView(plan: plan)
                 
             case 4:
-                RouteView()
+                FinPlanView()
                 
             case 5:
+                
                 if let selectedMap {
                     ShowMapView(map: selectedMap)
                 } else {

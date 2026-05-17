@@ -12,10 +12,15 @@ struct LocalSearchResponse: Codable {
 struct Feature: Codable {
     let Name: String
     let Geometry: Geometry
+    let Property: PropertyData?
 }
 
 struct Geometry: Codable {
     let Coordinates: String
+}
+
+struct PropertyData: Codable {
+    let Image1: String?
 }
 class mapviewModel:ObservableObject{
     
@@ -24,6 +29,7 @@ class mapviewModel:ObservableObject{
     @Published var isShowChangeSheet = false
     @Published var mapnumber: Int = 0
     @Published var searchText: String = ""
+    @Published var searchResults: [Feature] = []
 
     @Published var cameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
@@ -107,7 +113,7 @@ class mapviewModel:ObservableObject{
                 print("==== RAW JSON ====")
                 print(jsonString)
             }
-
+            
             // デコード
             let decoded = try JSONDecoder().decode(LocalSearchResponse.self, from: data)
 
@@ -135,9 +141,15 @@ class mapviewModel:ObservableObject{
                     senderName: f.Name
                 )
             }
+            if let imageURL = decoded.Feature?.first?.Property?.Image1 {
+                print(imageURL)
+            } else {
+                print("画像なし")
+            }
 
             await MainActor.run {
                 self.mapItems = items
+                self.searchResults = decoded.Feature ?? []
             }
 
             print("API END")
