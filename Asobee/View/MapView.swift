@@ -4,14 +4,27 @@ import FirebaseFirestore
 import MapKit
 
 struct MapView: View {
+    
     var plan: PlanItem
+    
     @Environment(\.dismiss) var dismiss
     @StateObject private var vm = mapviewModel()
+    
     var body: some View {
+        
         ZStack {
+            
+            Color(
+                red: 248 / 255,
+                green: 244 / 255,
+                blue: 236 / 255
+            )
+            .ignoresSafeArea()
+            
             Map(position: $vm.cameraPosition) {
-
+                
                 ForEach(vm.mapItems) { item in
+                    
                     Marker(
                         item.senderName,
                         coordinate: CLLocationCoordinate2D(
@@ -21,97 +34,183 @@ struct MapView: View {
                     )
                 }
             }
-            .onMapCameraChange { context in
-                vm.centerCoordinate = context.region.center
-                print(context.region.center.latitude)
-                print(context.region.center.longitude)
-            }
-            VStack {
-                HStack(spacing: 8) {
+            .mapStyle(vm.MapStyle)
+            .clipShape(
+                RoundedRectangle(cornerRadius: 28)
+            )
+            .padding(.horizontal)
+            .padding(.top, 90)
+            .padding(.bottom, 100)
+            
+            VStack(spacing: 0) {
+                
+                // MARK: Header
+                
+                ZStack {
+                    
+                    Text("集合場所を探す")
+                        .font(
+                            .custom(
+                                "KiwiMaru-Medium",
+                                size: 20
+                            )
+                        )
+                    
+                    HStack {
+                        
+                        Button {
+                            
+                            dismiss()
+                            
+                        } label: {
+                            
+                            Image(systemName: "chevron.left")
+                                .font(
+                                    .custom(
+                                        "KiwiMaru-Regular",
+                                        size: 22
+                                    )
+                                )
+                                .foregroundColor(
+                                    Color(
+                                        red: 255 / 255,
+                                        green: 162 / 255,
+                                        blue: 97 / 255
+                                    )
+                                )
+                        }
+                        
+                        Spacer()
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 10)
+                
+                // MARK: Search
+                
+                HStack(spacing: 10) {
+                    
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(.gray)
                     
-                    TextField("場所を検索", text: $vm.searchText)
-                        .textFieldStyle(.plain)
-                        .font(.custom("KiwiMaru-Regular", size: 24))
+                    TextField(
+                        "場所を検索",
+                        text: $vm.searchText
+                    )
+                    .font(
+                        .custom(
+                            "KiwiMaru-Regular",
+                            size: 18
+                        )
+                    )
                     
                     if !vm.searchText.isEmpty {
+                        
                         Button {
+                            
                             vm.searchText = ""
+                            
                         } label: {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundStyle(.gray)
-                                .font(.system(size: 24))
+                            
+                            Image(
+                                systemName:
+                                    "xmark.circle.fill"
+                            )
+                            .foregroundStyle(.gray)
                         }
                     }
                     
                     Button {
-                        let lat = vm.centerCoordinate.latitude
-                            let lon = vm.centerCoordinate.longitude
-
-                            print(lat)
-                            print(lon)
-
-                            Task {
-
-                                await vm.fetchLocalSearch(
-                                    query: vm.searchText,
-                                    latitude: lat,
-                                    longitude: lon
-                                )
-                            }
+                        
+                        let lat =
+                        vm.centerCoordinate.latitude
+                        
+                        let lon =
+                        vm.centerCoordinate.longitude
+                        
+                        Task {
+                            await vm.fetchLocalSearch(
+                                query: vm.searchText,
+                                latitude: lat,
+                                longitude: lon
+                            )
+                        }
+                        
                     } label: {
-
-                        Image(systemName: "arrow.forward.circle.fill")
-                            .font(.system(size: 24))
-                            .foregroundStyle(.blue)
+                        
+                        Image(
+                            systemName:
+                                "arrow.forward.circle.fill"
+                        )
+                        .font(.system(size: 24))
+                        .foregroundStyle(.blue)
                     }
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
+                .padding()
                 .background(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-                .shadow(color: .black.opacity(0.08), radius: 8)
-                .padding(.horizontal)
+                .clipShape(
+                    RoundedRectangle(cornerRadius: 18)
+                )
+                .shadow(
+                    color: .black.opacity(0.05),
+                    radius: 10,
+                    y: 4
+                )
+                .padding()
                 
                 Spacer()
             }
-            ForEach(vm.mapItems){ item in
-                
-            }
+            
+            // MARK: Center Pin
             
             Image(systemName: "mappin")
                 .font(.system(size: 40))
-                .foregroundColor(.red)
+                .foregroundStyle(.red)
                 .offset(y: -20)
             
+            // MARK: Bottom Button
+            
             VStack {
+                
                 Spacer()
                 
                 HStack {
                     
+                    Spacer()
+                    
                     Button {
+                        
                         vm.isShowChangeSheet = true
+                        
                     } label: {
+                        
                         Image(systemName: "map")
                             .font(.system(size: 24))
-                            .foregroundColor(.black)
-                            .padding(12)
-                            .background(Color.white)
+                            .foregroundStyle(.black)
+                            .padding(18)
+                            .background(.white)
                             .clipShape(Circle())
-                            .shadow(radius: 3)
+                            .shadow(
+                                color: .black.opacity(0.1),
+                                radius: 8,
+                                y: 4
+                            )
                     }
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 30)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 40)
             }
         }
-        .sheet(isPresented: $vm.isShowChangeSheet){
+        .navigationBarBackButtonHidden(true)
+        .sheet(isPresented: $vm.isShowChangeSheet) {
+            
             SheetView(
                 mapnumber: $vm.mapnumber,
                 mapStyle: $vm.MapStyle,
                 cameraPosition: $vm.cameraPosition
             )
+            .presentationDetents([.height(210)])
+            .presentationDragIndicator(.visible)
         }
     }
 }
@@ -156,7 +255,13 @@ struct SheetView: View {
             }
         }
         .padding()
+        .background(Color(
+            red: 248 / 255,
+            green: 244 / 255,
+            blue: 236 / 255
+        ))
     }
+    
 }
 #Preview {
     MapView(

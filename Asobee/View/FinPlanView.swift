@@ -1,6 +1,7 @@
 import SwiftUI
 import Firebase
 import FirebaseAuth
+import FirebaseFirestore
 
 struct ScheduleItem: Identifiable {
 
@@ -9,8 +10,14 @@ struct ScheduleItem: Identifiable {
     var time: Date = Date()
     var place: String = ""
 }
+struct FinSchedule: Codable {
+
+    var time: Date
+    var place: String
+}
 
 struct FinPlanView: View {
+    var plan:PlanItem
     @Environment(\.dismiss) var dismiss
     @State private var title = ""
 
@@ -75,6 +82,10 @@ struct FinPlanView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 10)
+                .onAppear {
+
+                    fetchFinPlan()
+                }
 
                 ScrollView {
 
@@ -101,7 +112,6 @@ struct FinPlanView: View {
 }
 
 // MARK: - Header
-
 extension FinPlanView {
 
     var headerView: some View {
@@ -163,17 +173,30 @@ extension FinPlanView {
             Divider()
 
             VStack(alignment: .leading, spacing: 8) {
-
-                Label(
-                    "集合場所",
-                    systemImage: "mappin.and.ellipse"
-                )
-                .font(
-                    .custom(
-                        "KiwiMaru-Medium",
-                        size: 20
+                HStack{
+                    Label(
+                        "集合場所",
+                        systemImage: "mappin.and.ellipse"
                     )
-                )
+                    .font(
+                        .custom(
+                            "KiwiMaru-Medium",
+                            size: 20
+                        )
+                    )
+                    .padding(.trailing, 16)
+                    NavigationStack {
+
+                        NavigationLink {
+                            MapView(plan:plan)
+                        } label: {
+
+                            Image(systemName: "map")
+                                .foregroundStyle(.black)
+                        }
+                    }
+                    
+                }
 
                 TextField(
                     "例: 渋谷駅ハチ公前",
@@ -332,7 +355,9 @@ extension FinPlanView {
     var saveButton: some View {
 
         Button {
-
+            createFinPlan(
+                    title: title,startDate: startselectedDate,endDate: endselectedDate,meetingPlace: meetingPlace,schedules: schedules,planId: plan.id
+                )
         } label: {
 
             HStack {
@@ -374,7 +399,11 @@ extension FinPlanView {
 extension FinPlanView {
 
     func createFinPlan(
-        chat: String,
+        title: String,
+        startDate: Date,
+        endDate: Date,
+        meetingPlace: String,
+        schedules: [ScheduleItem],
         planId: String
     ) {
 
@@ -389,9 +418,49 @@ extension FinPlanView {
             .getDocument { snapshot, _ in
 
                 let name =
-                snapshot?.data()?["userName"]
-                as? String ?? "不明"
+                snapshot?.data()?["userName"] as? String ?? "不明"
 
+                let scheduleData = schedules.map {
+
+                    [
+                        "time": Timestamp(date: $0.time),
+                        "place": $0.place
+                    ]
+                }
+
+                // しおり保存
+                db.collection("plans")
+                    .document(planId)
+                    .collection("finPlan")
+                    .document("main")
+                    .setData([
+
+                        "title": title,
+
+                        "startDate":
+                            Timestamp(date: startDate),
+
+                        "endDate":
+                            Timestamp(date: endDate),
+
+                        "meetingPlace":
+                            meetingPlace,
+
+                        "schedules":
+                            scheduleData,
+
+                        "updatedAt":
+                            Timestamp(date: Date()),
+
+                        "senderId":
+                            uid,
+
+                        "senderName":
+                            name
+
+                    ], merge: true)
+
+                // チャット通知
                 db.collection("plans")
                     .document(planId)
                     .collection("messages")
@@ -401,7 +470,7 @@ extension FinPlanView {
                             Timestamp(date: Date()),
 
                         "chat":
-                            chat,
+                            "\(name)がしおりを変更しました！",
 
                         "senderId":
                             uid,
@@ -411,9 +480,69 @@ extension FinPlanView {
                     ])
             }
     }
+    func fetchFinPlan() {
+
+        let db = Firestore.firestore()
+
+        db.collection("plans")
+            .document(plan.id)
+            .collection("finPlan")
+            .document("main")
+            .getDocument { snapshot, error in
+
+                guard let data = snapshot?.data() else {
+                    return
+                }
+
+                title = data["title"] as? String ?? ""
+
+                meetingPlace =
+                data["meetingPlace"] as? String ?? ""
+
+                if let start =
+                    data["startDate"] as? Timestamp {
+
+                    startselectedDate = start.dateValue()
+                }
+
+                if let end =
+                    data["endDate"] as? Timestamp {
+
+                    endselectedDate = end.dateValue()
+                }
+
+                if let schedulesData =
+                    data["schedules"] as? [[String: Any]] {
+
+                    schedules = schedulesData.map {
+
+                        ScheduleItem(
+                            time:
+                                ($0["time"] as? Timestamp)?
+                                .dateValue()
+                            ?? Date(),
+
+                            place:
+                                $0["place"] as? String
+                            ?? ""
+                        )
+                    }
+                }
+            }
+    }
 }
 
 #Preview {
 
-    FinPlanView()
+    FinPlanView(
+        plan: PlanItem(
+            id: "preview-id",
+            title: "テストプラン",
+            ownerId: "user1",
+            inviteFriends: [
+                "user2",
+                "user3"
+            ]
+        )
+    )
 }

@@ -190,7 +190,7 @@ struct ChatView: View {
                 MapView(plan: plan)
                 
             case 4:
-                FinPlanView()
+                FinPlanView(plan:plan)
                 
             case 5:
                 
