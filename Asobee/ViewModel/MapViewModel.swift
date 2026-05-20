@@ -23,7 +23,9 @@ struct PropertyData: Codable {
     let Image1: String?
 }
 class mapviewModel:ObservableObject{
-    
+    @Published var showFinPlanView: Bool = false
+    @Published var selectedLatitude = 0.0
+    @Published var selectedLongitude = 0.0
     @Published var mapItems: [MapItem] = []
     @Published var MapStyle: MapStyle = .standard
     @Published var isShowChangeSheet = false

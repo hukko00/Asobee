@@ -4,6 +4,7 @@ import FirebaseAuth
 import SwiftData
 struct ChatView: View {
     var plan: PlanItem
+    @StateObject private var vm = mapviewModel()
     @State private var listener: ListenerRegistration?
     @State var text: String = ""
     @Environment(\.modelContext) var context
@@ -184,13 +185,17 @@ struct ChatView: View {
                 QuestionnaireView(plan: plan)
                 
             case 2:
-                ScheduleSelect()
+                EmptyView()
                 
             case 3:
-                MapView(plan: plan)
+                GatheringMapView(plan: plan)
                 
             case 4:
-                FinPlanView(plan:plan)
+                FinPlanView(
+                    latitude: vm.selectedLatitude,
+                    longitude: vm.selectedLongitude,
+                    plan: plan
+                )
                 
             case 5:
                 

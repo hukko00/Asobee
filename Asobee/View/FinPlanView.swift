@@ -17,6 +17,8 @@ struct FinSchedule: Codable {
 }
 
 struct FinPlanView: View {
+    let latitude: Double
+    let longitude: Double
     var plan:PlanItem
     @Environment(\.dismiss) var dismiss
     @State private var title = ""
@@ -188,7 +190,7 @@ extension FinPlanView {
                     NavigationStack {
 
                         NavigationLink {
-                            MapView(plan:plan)
+                            GatheringMapView(plan:plan)
                         } label: {
 
                             Image(systemName: "map")
@@ -434,33 +436,16 @@ extension FinPlanView {
                     .collection("finPlan")
                     .document("main")
                     .setData([
-
                         "title": title,
-
-                        "startDate":
-                            Timestamp(date: startDate),
-
-                        "endDate":
-                            Timestamp(date: endDate),
-
-                        "meetingPlace":
-                            meetingPlace,
-
-                        "schedules":
-                            scheduleData,
-
-                        "updatedAt":
-                            Timestamp(date: Date()),
-
-                        "senderId":
-                            uid,
-
+                        "startDate":Timestamp(date: startDate),
+                        "endDate": Timestamp(date: endDate),
+                        "meetingPlace": meetingPlace,
+                        "schedules": scheduleData,
+                        "updatedAt":Timestamp(date: Date()),
+                        "senderId":uid,
                         "senderName":
                             name
-
                     ], merge: true)
-
-                // チャット通知
                 db.collection("plans")
                     .document(planId)
                     .collection("messages")
@@ -531,18 +516,22 @@ extension FinPlanView {
             }
     }
 }
-
 #Preview {
 
-    FinPlanView(
-        plan: PlanItem(
-            id: "preview-id",
-            title: "テストプラン",
-            ownerId: "user1",
-            inviteFriends: [
-                "user2",
-                "user3"
-            ]
+    NavigationStack {
+
+        FinPlanView(
+            latitude: 35.681236,
+            longitude: 139.767125,
+            plan: PlanItem(
+                id: "preview-id",
+                title: "テストプラン",
+                ownerId: "user1",
+                inviteFriends: [
+                    "user2",
+                    "user3"
+                ]
+            )
         )
-    )
+    }
 }

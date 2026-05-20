@@ -21,11 +21,6 @@ struct PlusButtonView: View {
             }
 
             HStack(spacing: 30) {
-                Button {
-                    onSelect(3)
-                } label: {
-                    ButtonBuilder(text: "マップ", image: "map")
-                }
 
                 Button {
                     onSelect(4)

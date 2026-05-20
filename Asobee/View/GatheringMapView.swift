@@ -3,7 +3,7 @@ import FirebaseAuth
 import FirebaseFirestore
 import MapKit
 
-struct MapView: View {
+struct GatheringMapView: View {
     
     var plan: PlanItem
     
@@ -175,7 +175,30 @@ struct MapView: View {
                 Spacer()
                 
                 HStack {
-                    
+                    Button {
+
+                        if let region = vm.cameraPosition.region {
+
+                            let lat = region.center.latitude
+                            let lon = region.center.longitude
+
+                            vm.selectedLatitude = lat
+                            vm.selectedLongitude = lon
+
+                            vm.showFinPlanView = true
+                        }
+
+                    } label: {
+
+                        Text("決定")
+                            .font(.custom("KiwiMaru-Medium", size: 25))
+                            .foregroundStyle(Color.white)
+                            .padding(.horizontal, 60)
+                            .padding(5)
+                            .background(.blue)
+                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                            .padding(.leading, 55)
+                    }
                     Spacer()
                     
                     Button {
@@ -211,6 +234,13 @@ struct MapView: View {
             )
             .presentationDetents([.height(210)])
             .presentationDragIndicator(.visible)
+        }
+        .navigationDestination(isPresented: $vm.showFinPlanView) {
+            FinPlanView(
+                latitude: vm.selectedLatitude,
+                longitude: vm.selectedLongitude,
+                plan:plan
+            )
         }
     }
 }
@@ -264,7 +294,7 @@ struct SheetView: View {
     
 }
 #Preview {
-    MapView(
+    GatheringMapView(
         plan: PlanItem(
             id: "test-id",
             title: "Sample Plan",
