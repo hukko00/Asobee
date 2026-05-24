@@ -17,6 +17,8 @@ struct QuestionnaireView: View {
     @State private var selected: String? = nil
     @State private var choices: [String] = ["", ""]
     @State private var title: String = ""
+    @State private var date: Date = Date()
+    @State private var ignorename = false
 
     let templates = [
         "お昼ごはんどうする？",
@@ -74,22 +76,23 @@ extension QuestionnaireView {
 
             Text("アンケート作成")
                 .font(.custom("KiwiMaru-Medium", size: 20))
-
-            HStack {
-
-                Button {
-                    dismiss()
-
-                } label: {
-
-                    Image(systemName: "chevron.left")
-                        .font(.custom("KiwiMaru-Regular", size: 22))
-                        .foregroundColor(
-                            colorcode(r: 255, g: 162, b: 97)
-                        )
+            VStack{
+                HStack {
+                    
+                    Button {
+                        dismiss()
+                        
+                    } label: {
+                        
+                        Image(systemName: "chevron.left")
+                            .font(.custom("KiwiMaru-Regular", size: 22))
+                            .foregroundColor(
+                                colorcode(r: 255, g: 162, b: 97)
+                            )
+                    }
+                    
+                    Spacer()
                 }
-
-                Spacer()
             }
         }
         .padding(.horizontal, 20)
@@ -113,6 +116,31 @@ extension QuestionnaireView {
                 .padding()
                 .background(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 18))
+            HStack{
+                Text("期日")
+                    .font(.custom("KiwiMaru-Medium", size: 22))
+                DatePicker("Start Date",selection: $date,displayedComponents: [.date])
+                .labelsHidden()
+                .padding(.horizontal,10)
+                Text("匿名回答")
+                .font(.custom("KiwiMaru-Medium", size: 22))
+                Button{
+                    ignorename.toggle()
+                    print(ignorename ? "true":"false")
+                } label:{
+                    ZStack{
+                        Image(systemName:ignorename ? "square":"square")
+                            .font(.custom("KiwiMaru-Medium", size: 22))
+                            .foregroundStyle(.black)
+                        if ignorename {
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 16))
+                                        .foregroundStyle(.black)
+                            }
+                    }
+                }
+                .animation(nil, value: ignorename)
+            }
         }
     }
 }
@@ -148,28 +176,20 @@ extension QuestionnaireView {
             }
 
             ForEach(choices.indices, id: \.self) { index in
-
                 VStack(alignment: .leading, spacing: 10) {
-
                     Text("選択肢 \(index + 1)")
                         .font(.custom("KiwiMaru-Regular", size: 14))
                         .foregroundStyle(.gray)
-
                     HStack {
-
                         TextField("入力してください", text: $choices[index])
                             .font(.custom("KiwiMaru-Regular", size: 18))
                             .focused($focusedField, equals: index)
-
                         Button {
-
                             if choices.count > 2 {
                                 choices.remove(at: index)
                             }
-
                         } label: {
-
-                            Image(systemName: "minus.circle.fill")
+                            Image(systemName: choices.count > 2 ? "minus.circle.fill":"")
                                 .foregroundStyle(.red)
                         }
                     }
@@ -185,24 +205,18 @@ extension QuestionnaireView {
 // MARK: - CreateButton
 
 extension QuestionnaireView {
-
     var createButton: some View {
-
         VStack {
-
             Divider()
-
             Button {
-
                 createQuestion(
                     title: title,
-                    choices: choices
+                    choices: choices,
+                    ignorename: ignorename,
+                    finishdate: date
                 )
-
                 dismiss()
-
             } label: {
-
                 Text("作成する")
                     .font(.custom("KiwiMaru-Medium", size: 20))
                     .foregroundStyle(.white)
@@ -224,7 +238,7 @@ extension QuestionnaireView {
 
 extension QuestionnaireView {
 
-    func createQuestion(title: String, choices: [String]) {
+    func createQuestion(title: String, choices: [String],ignorename:Bool,finishdate:Date) {
 
         guard let uid = Auth.auth().currentUser?.uid else {
             return
@@ -246,7 +260,9 @@ extension QuestionnaireView {
                         "choices": choices.filter { !$0.isEmpty },
                         "createdAt": Timestamp(date: Date()),
                         "senderId": uid,
-                        "senderName": name
+                        "senderName": name,
+                        "ignorename":ignorename,
+                        "finishdate":finishdate
                     ])
             }
     }
@@ -265,7 +281,7 @@ extension QuestionnaireView {
         )
     }
 }
-
+// MARK: - Preview
 #Preview {
 
     NavigationStack {

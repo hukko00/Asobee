@@ -2,31 +2,25 @@
 import SwiftUI
 
 struct PlusButtonView: View {
-
+    
     var onSelect: (Int) -> Void
     var body: some View {
-        VStack(spacing: 30) {
-            HStack(spacing: 30) {
-                Button {
-                    onSelect(1)
-                } label: {
-                    ButtonBuilder(text: "アンケート", image: "questionmark.message")
-                }
-
-                Button {
-                    onSelect(2)
-                } label: {
-                    ButtonBuilder(text: "日程調整", image: "calendar")
-                }
+        HStack(spacing: 30) {
+            Button {
+                onSelect(1)
+            } label: {
+                ButtonBuilder(text: "アンケート", image: "questionmark.message")
             }
-
-            HStack(spacing: 30) {
-
-                Button {
-                    onSelect(4)
-                } label: {
-                    ButtonBuilder(text: "しおり", image: "text.document")
-                }
+            
+            Button {
+                onSelect(2)
+            } label: {
+                ButtonBuilder(text: "日程調整", image: "calendar")
+            }
+            Button {
+                onSelect(4)
+            } label: {
+                ButtonBuilder(text: "しおり", image: "text.document")
             }
         }
     }

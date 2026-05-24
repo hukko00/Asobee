@@ -106,7 +106,7 @@ struct PlanView: View {
                     } label: {
                         Image(systemName: "plus")
                             .font(.system(size: 24, weight: .bold))
-                            .padding(20) // ← デカくして押しやすく
+                            .padding(20)
                             .background(Color(red: 121/255, green: 144/255, blue: 67/255))
                             .foregroundColor(.white)
                             .clipShape(Circle())

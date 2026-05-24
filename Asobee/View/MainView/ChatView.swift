@@ -14,7 +14,6 @@ struct ChatView: View {
     @State private var showPlusMenu = false
     @State private var navigationNumber = 0
     @State private var selectedMap: MapItem? = nil
-    @State private var selectedQuestion: QuestionItem? = nil
     @StateObject var chatviewModel = chatviewmodel()
     
     var body: some View {
@@ -105,14 +104,31 @@ struct ChatView: View {
                     }
                 }
                 Spacer()
-                
+                if showPlusMenu {
+
+                    ZStack {
+
+                        RoundedRectangle(cornerRadius: 25)
+                            .fill(Color.white)
+
+                        PlusButtonView { number in
+
+                            showPlusMenu = false
+                            navigationNumber = number
+                        }
+                    }
+                    .frame(height: 300)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 10)
+                    .shadow(color: .black.opacity(0.1), radius: 10)
+                }
                 HStack(spacing: 10) {
                     Button {
                         withAnimation(.easeInOut(duration: 0.25)) {
                             showPlusMenu.toggle()
                         }
                     } label:{
-                        Image(systemName: "plus")
+                        Image(systemName: showPlusMenu ? "xmark":"plus")
                             .font(.system(size: 20))
                             .foregroundColor(colorcode(r: 127, g: 183, b: 126))
                     }
@@ -151,30 +167,8 @@ struct ChatView: View {
                 .padding(.horizontal, 12)
                 .padding(.bottom, 10)
             }
-            if showPlusMenu {
-                
-                Color.black.opacity(0.2)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation {
-                            showPlusMenu = false
-                        }
-                    }
-                
-                VStack {
-                    Spacer()
-                    
-                    PlusButtonView { number in
-                        showPlusMenu = false
-                        navigationNumber = number
-                    }
-                    .padding(.bottom, 90)
-                }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
         }
         
-        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: showPlusMenu)
         .navigationDestination(isPresented: Binding(
             get: { navigationNumber != 0 },
             set: { _ in navigationNumber = 0 }

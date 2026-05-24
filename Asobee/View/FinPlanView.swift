@@ -443,8 +443,7 @@ extension FinPlanView {
                         "schedules": scheduleData,
                         "updatedAt":Timestamp(date: Date()),
                         "senderId":uid,
-                        "senderName":
-                            name
+                        "senderName":name
                     ], merge: true)
                 db.collection("plans")
                     .document(planId)
