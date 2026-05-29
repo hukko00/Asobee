@@ -293,13 +293,13 @@ struct SheetView: View {
     }
     
 }
-#Preview {
-    GatheringMapView(
-        plan: PlanItem(
-            id: "test-id",
-            title: "Sample Plan",
-            ownerId: "preview-user",
-            inviteFriends: []
-        )
-    )
-}
+//#Preview {
+//    GatheringMapView(
+//        plan: PlanItem(
+//            id: "test-id",
+//            title: "Sample Plan",
+//            ownerId: "preview-user",
+//            inviteFriends: []
+//        )
+//    )
+//}

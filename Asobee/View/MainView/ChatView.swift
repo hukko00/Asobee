@@ -14,6 +14,7 @@ struct ChatView: View {
     @State private var showPlusMenu = false
     @State private var navigationNumber = 0
     @State private var selectedMap: MapItem? = nil
+    @State private var selectedQuestion: QuestionItem? = nil
     @StateObject var chatviewModel = chatviewmodel()
     
     var body: some View {
@@ -105,14 +106,14 @@ struct ChatView: View {
                 }
                 Spacer()
                 if showPlusMenu {
-
+                    
                     ZStack {
-
+                        
                         RoundedRectangle(cornerRadius: 25)
                             .fill(Color.white)
-
+                        
                         PlusButtonView { number in
-
+                            
                             showPlusMenu = false
                             navigationNumber = number
                         }
@@ -132,7 +133,7 @@ struct ChatView: View {
                             .font(.system(size: 20))
                             .foregroundColor(colorcode(r: 127, g: 183, b: 126))
                     }
-
+                    
                     Button{
                         
                     } label:{
@@ -140,13 +141,13 @@ struct ChatView: View {
                             .font(.system(size: 20))
                             .foregroundColor(colorcode(r: 127, g: 183, b: 126))
                     }
-
+                    
                     TextField("メッセージを入力", text: $text)
                         .font(.custom("KiwiMaru-Regular", size: 18))
                         .padding(10)
                         .background(Color.white)
                         .cornerRadius(10)
-
+                    
                     Button{
                         if !text.isEmpty {
                             chatviewModel.createChat(chat: text, planId: plan.id)
@@ -199,8 +200,9 @@ struct ChatView: View {
                     Text("データなし")
                 }
             case 6:
-                if let selectedMap {
-                    ShowMapView(map: selectedMap)
+
+                if let selectedQuestion {
+                    AnswerView(question: selectedQuestion)
                 } else {
                     Text("データなし")
                 }
@@ -264,7 +266,7 @@ struct ChatView: View {
                         Image(systemName: "map.fill")
                             .font(.system(size: 26))
                             .foregroundStyle(.black)
-
+                        
                         Text("位置情報")
                             .font(.custom("KiwiMaru-Regular", size: 18))
                             .foregroundStyle(.black)
@@ -274,52 +276,55 @@ struct ChatView: View {
                         isMe ?
                         colorcode(r: 255, g: 162, b: 97)
                         :
-                        colorcode(r: 127, g: 183, b: 126)
+                            colorcode(r: 127, g: 183, b: 126)
                     )
                     .cornerRadius(14)
                 }
             }else if item.type == .question {
-                Button {
-                    
-                } label: {
-                    VStack(spacing: 6) {
-                        Text("アンケート")
-                            .font(.custom("KiwiMaru-Regular", size: 30))
-                            .foregroundStyle(.black)
-                        Image(systemName: "text.document")
-                            .font(.custom("KiwiMaru-Regular", size: 26))
-                            .foregroundStyle(.black)
-
-                        Text(item.title ?? "")
-                            .font(.custom("KiwiMaru-Regular", size: 18))
-                            .foregroundStyle(.black)
+                if let question = chatviewModel.questions.first(where: {
+                    $0.id == item.id
+                }) {
+                    Button {
+                        selectedQuestion = question
+                        navigationNumber = 6
+                    } label: {
+                        VStack(spacing: 6) {
+                            Text("アンケート")
+                                .font(.custom("KiwiMaru-Regular", size: 30))
+                                .foregroundStyle(.black)
+                            Image(systemName: "text.document")
+                                .font(.custom("KiwiMaru-Regular", size: 26))
+                                .foregroundStyle(.black)
+                            
+                            Text(item.title ?? "")
+                                .font(.custom("KiwiMaru-Regular", size: 18))
+                                .foregroundStyle(.black)
+                        }
+                        .padding(12)
+                        .background(
+                            isMe ?
+                            colorcode(r: 255, g: 162, b: 97)
+                            :
+                                colorcode(r: 127, g: 183, b: 126)
+                        )
+                        .cornerRadius(14)
                     }
-                    .padding(12)
-                    .background(
-                        isMe ?
-                        colorcode(r: 255, g: 162, b: 97)
-                        :
-                        colorcode(r: 127, g: 183, b: 126)
-                    )
-                    .cornerRadius(14)
                 }
             }
-            
             Text(item.senderName)
                 .font(.custom("KiwiMaru-Regular", size: 11))
                 .foregroundColor(.gray)
         }
-        .padding(.horizontal, 16)
     }
 }
-#Preview {
-    ChatView(
-        plan: PlanItem(
-            id: "test",
-            title: "テストプラン",
-            ownerId: "user",
-            inviteFriends: []
-        )
-    )
-    .environmentObject(TabBarState())
-}
+//#Preview {
+//    ChatView(
+//        plan: PlanItem(
+//            id: "test",
+//            title: "テストプラン",
+//            ownerId: "user",
+//            inviteFriends: []
+//        )
+//    )
+//    .environmentObject(TabBarState())
+//}@

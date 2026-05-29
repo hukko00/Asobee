@@ -282,17 +282,17 @@ extension QuestionnaireView {
     }
 }
 // MARK: - Preview
-#Preview {
-
-    NavigationStack {
-
-        QuestionnaireView(
-            plan: PlanItem(
-                id: "preview-id",
-                title: "テストプラン",
-                ownerId: "user1",
-                inviteFriends: ["user2", "user3"]
-            )
-        )
-    }
-}
+//#Preview {
+//
+//    NavigationStack {
+//
+//        QuestionnaireView(
+//            plan: PlanItem(
+//                id: "preview-id",
+//                title: "テストプラン",
+//                ownerId: "user1",
+//                inviteFriends: ["user2", "user3"]
+//            )
+//        )
+//    }
+//}

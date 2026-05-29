@@ -93,6 +93,6 @@ struct FriendListView: View {
     }
 }
 
-#Preview {
-    FriendListView()
-}
+//#Preview {
+//    FriendListView()
+//}

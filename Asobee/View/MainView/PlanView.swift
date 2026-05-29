@@ -126,7 +126,7 @@ struct PlanView: View {
         }
     }
 }
-
-#Preview {
-    PlanView()
-}
+//
+//#Preview {
+//    PlanView()
+//}

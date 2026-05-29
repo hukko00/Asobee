@@ -54,15 +54,15 @@ struct ShowMapView: View {
     }
 }
 
-#Preview {
-    ShowMapView(
-        map: MapItem(
-            id: "preview-id",
-            lat: 35.681236,
-            lng: 139.767125,
-            createdAt: Date(),
-            senderId: "user1",
-            senderName: "masa"
-        )
-    )
-}
+//#Preview {
+//    ShowMapView(
+//        map: MapItem(
+//            id: "preview-id",
+//            lat: 35.681236,
+//            lng: 139.767125,
+//            createdAt: Date(),
+//            senderId: "user1",
+//            senderName: "masa"
+//        )
+//    )
+//}

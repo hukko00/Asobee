@@ -64,7 +64,7 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
-        .environmentObject(TabBarState())
-}
+//#Preview {
+//    ContentView()
+//        .environmentObject(TabBarState())
+//}

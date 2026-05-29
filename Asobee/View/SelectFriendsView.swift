@@ -92,6 +92,6 @@ struct SelectFriendsView: View {
     }
 }
 
-#Preview {
-    FriendListView()
-}
+//#Preview {
+//    FriendListView()
+//}
