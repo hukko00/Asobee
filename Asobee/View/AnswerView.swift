@@ -1,26 +1,42 @@
 import SwiftUI
+import Firebase
+import FirebaseFirestore
+import FirebaseAuth
 
 struct AnswerView: View {
+
     let question: QuestionItem
+    let plan: PlanItem
+
     @Environment(\.dismiss) var dismiss
-    @State private var selectedChoice: String = ""
+
+    @State private var selectedIndex: Int?
+    @State private var hasAnswered = false
+
     var body: some View {
+
         ZStack {
+
             Color(
                 red: 247 / 255,
                 green: 246 / 255,
                 blue: 242 / 255
             )
             .ignoresSafeArea()
+
             VStack(spacing: 20) {
-                // 上バー
+
                 ZStack {
+
                     Text(question.title)
                         .font(.custom("KiwiMaru-Medium", size: 20))
+
                     HStack {
+
                         Button {
                             dismiss()
                         } label: {
+
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 22))
                                 .foregroundColor(
@@ -31,17 +47,34 @@ struct AnswerView: View {
                                     )
                                 )
                         }
+
                         Spacer()
                     }
                 }
                 .padding(.horizontal, 20)
+
+                if hasAnswered {
+
+                    Text("回答済みです")
+                        .font(.custom("KiwiMaru-Regular", size: 15))
+                        .foregroundStyle(.gray)
+
+                }
+
                 ScrollView {
+
                     VStack(spacing: 16) {
-                        ForEach(question.choices, id: \.self) { choice in
+
+                        ForEach(
+                            Array(question.choices.enumerated()),
+                            id: \.offset
+                        ) { index, choice in
 
                             Button {
 
-                                selectedChoice = choice
+                                if !hasAnswered {
+                                    selectedIndex = index
+                                }
 
                             } label: {
 
@@ -53,7 +86,7 @@ struct AnswerView: View {
 
                                     Spacer()
 
-                                    if selectedChoice == choice {
+                                    if selectedIndex == index {
 
                                         Image(systemName: "largecircle.fill.circle")
                                             .foregroundStyle(
@@ -79,55 +112,140 @@ struct AnswerView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 10)
                 }
+
                 Button {
-                    if selectedChoice.isEmpty{
-                        print(selectedChoice)
+
+                    guard let selectedIndex else {
+                        return
                     }
+
+                    answer(number: selectedIndex)
+
                 } label: {
-                    Text("回答を送信")
-                        .font(.custom("KiwiMaru-Medium", size: 20))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            Color(
-                                red: 255 / 255,
-                                green: 162 / 255,
-                                blue: 97 / 255
-                            )
+
+                    Text(
+                        hasAnswered
+                        ? "回答済み"
+                        : "回答を送信"
+                    )
+                    .font(.custom("KiwiMaru-Medium", size: 20))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(
+                        hasAnswered
+                        ? Color.gray
+                        : Color(
+                            red: 255 / 255,
+                            green: 162 / 255,
+                            blue: 97 / 255
                         )
-                        .cornerRadius(18)
+                    )
+                    .cornerRadius(18)
                 }
+                .disabled(hasAnswered)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 10)
             }
         }
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            checkAnswered()
+        }
     }
-    func colorcode(r:Int,g:Int,b:Int)-> Color{
-        return Color(
-            red: Double(r)/255,
-            green: Double(g)/255,
-            blue: Double(b)/255
+
+    func colorcode(
+        r: Int,
+        g: Int,
+        b: Int
+    ) -> Color {
+
+        Color(
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue: Double(b) / 255
         )
     }
+
+    func checkAnswered() {
+
+        guard let uid =
+                Auth.auth().currentUser?.uid
+        else {
+            return
+        }
+
+        Firestore.firestore()
+            .collection("plans")
+            .document(plan.id)
+            .collection("questions")
+            .document(question.id)
+            .getDocument { snapshot, error in
+
+                guard let data = snapshot?.data()
+                else {
+                    return
+                }
+
+                let answeredUsers =
+                    data["answeredUsers"]
+                    as? [String] ?? []
+
+                DispatchQueue.main.async {
+
+                    hasAnswered =
+                    answeredUsers.contains(uid)
+
+                }
+            }
+    }
+
+    func answer(number: Int) {
+
+        guard let uid =
+                Auth.auth().currentUser?.uid
+        else {
+            return
+        }
+
+        let ref = Firestore.firestore()
+            .collection("plans")
+            .document(plan.id)
+            .collection("questions")
+            .document(question.id)
+
+        ref.getDocument { snapshot, error in
+
+            guard let data = snapshot?.data()
+            else {
+                return
+            }
+
+            let answeredUsers =
+                data["answeredUsers"]
+                as? [String] ?? []
+
+            if answeredUsers.contains(uid) {
+                return
+            }
+
+            ref.updateData([
+                "answerCounts.\(number)":
+                    FieldValue.increment(Int64(1)),
+                "answeredUsers":
+                    FieldValue.arrayUnion([uid])
+            ]) { error in
+
+                if error == nil {
+
+                    DispatchQueue.main.async {
+
+                        hasAnswered = true
+
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
 }
-//
-//#Preview {
-//    NavigationStack {
-//        AnswerView(
-//            question: QuestionItem(
-//                id: "test-question",
-//                title: "遊びアンケート",
-//                choices: [
-//                    "好きな食べ物は？",
-//                    "集合時間は？",
-//                    "行きたい場所は？"
-//                ],
-//                createdAt: Date(),
-//                senderId: "user1",
-//                senderName: "まさ"
-//            )
-//        )
-//    }
-//}

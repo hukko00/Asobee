@@ -238,7 +238,7 @@ extension QuestionnaireView {
 
 extension QuestionnaireView {
 
-    func createQuestion(title: String, choices: [String],ignorename:Bool,finishdate:Date) {
+    func createQuestion(title: String, choices: [String], ignorename: Bool, finishdate: Date) {
 
         guard let uid = Auth.auth().currentUser?.uid else {
             return
@@ -252,17 +252,21 @@ extension QuestionnaireView {
 
                 let name = snapshot?.data()?["userName"] as? String ?? "不明"
 
+                let validChoices = choices.filter { !$0.isEmpty }
+
                 db.collection("plans")
                     .document(plan.id)
                     .collection("questions")
                     .addDocument(data: [
                         "title": title,
-                        "choices": choices.filter { !$0.isEmpty },
+                        "choices": validChoices,
+                        "answerCounts": Array(repeating: 0, count: validChoices.count),
                         "createdAt": Timestamp(date: Date()),
                         "senderId": uid,
                         "senderName": name,
-                        "ignorename":ignorename,
-                        "finishdate":finishdate
+                        "ignorename": ignorename,
+                        "finishdate": finishdate,
+                        "answeredUsers": []
                     ])
             }
     }

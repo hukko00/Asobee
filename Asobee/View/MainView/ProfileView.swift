@@ -37,7 +37,7 @@ struct LoginVisionView: View {
                     isLogin = true
                 }label:{
                     Text("ログイン")
-                        .font(.custom("KiwiMaru-Regular",size: 20))
+                        .font(.custom("KiwiMaru-Light",size: 20))
                     .foregroundColor(isLogin ? .white : mainColor)
                     .padding()
                     .frame(maxWidth: .infinity)

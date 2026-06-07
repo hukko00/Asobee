@@ -17,6 +17,7 @@ struct ChatItem: Identifiable {
     let createdAt: Date
     let senderId: String
     let senderName: String
+    let readUsers: [String]
 }
 struct MapItem: Identifiable {
     let id: String
@@ -39,18 +40,20 @@ struct TimelineItem: Identifiable {
     let senderName: String
     let createdAt: Date
     let type: ItemType
-    
     let chat: String?
     let lat: Double?
     let lng: Double?
     let title: String?
     let choices: [String]?
+    let readUsers: [String]?
 }
 
 struct QuestionItem: Identifiable {
     let id: String
     let title: String
     let choices: [String]
+    let answerCounts: [Int]
+    let answeredUsers: [String]
     let createdAt: Date
     let senderId: String
     let senderName: String
@@ -142,13 +145,14 @@ class chatviewmodel:ObservableObject{
                     else {
                         continue
                     }
-
+                    let readUsers = data["readUsers"] as? [String] ?? []
                     let item = ChatItem(
                         id: doc.documentID,
                         chat: chat,
                         createdAt: timestamp.dateValue(),
                         senderId: senderId,
-                        senderName: senderName
+                        senderName: senderName,
+                        readUsers: readUsers
                     )
 
                     results.append(item)
@@ -247,12 +251,17 @@ class chatviewmodel:ObservableObject{
                         let senderName = data["senderName"] as? String,
                         let timestamp = data["createdAt"] as? Timestamp
                     else { continue }
+
+                    let answerCounts = data["answerCounts"] as? [Int] ?? []
+                    let answeredUsers = data["answeredUsers"] as? [String] ?? []
                     
                     results.append(
                         QuestionItem(
                             id: doc.documentID,
                             title: title,
                             choices: choices,
+                            answerCounts: answerCounts,
+                            answeredUsers: answeredUsers,
                             createdAt: timestamp.dateValue(),
                             senderId: senderId,
                             senderName: senderName
@@ -280,7 +289,8 @@ class chatviewmodel:ObservableObject{
                 lat: nil,
                 lng: nil,
                 title: nil,
-                choices: nil
+                choices: nil,
+                readUsers: $0.readUsers
             )
         }
         
@@ -295,7 +305,8 @@ class chatviewmodel:ObservableObject{
                 lat: $0.lat,
                 lng: $0.lng,
                 title: nil,
-                choices: nil
+                choices: nil,
+                readUsers:nil
             )
         }
         
@@ -310,7 +321,8 @@ class chatviewmodel:ObservableObject{
                 lat: nil,
                 lng: nil,
                 title: $0.title,
-                choices: $0.choices
+                choices: $0.choices,
+                readUsers:nil
             )
         }
         
@@ -319,21 +331,22 @@ class chatviewmodel:ObservableObject{
     }
     func createChat(chat: String, planId: String) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
-        
+
         let db = Firestore.firestore()
-        
+
         db.collection("users").document(uid).getDocument { snapshot, _ in
-            
+
             let name = snapshot?.data()?["userName"] as? String ?? "不明"
-            
+
             db.collection("plans")
-                .document(planId) // ←ここ修正
+                .document(planId)
                 .collection("messages")
                 .addDocument(data: [
                     "createdAt": Timestamp(date: Date()),
                     "chat": chat,
                     "senderId": uid,
-                    "senderName": name
+                    "senderName": name,
+                    "readUsers": [uid]
                 ])
         }
     }
@@ -368,5 +381,24 @@ class chatviewmodel:ObservableObject{
         else { return }
 
         navigationController.interactivePopGestureRecognizer?.isEnabled = true
+    }
+    func markAllAsRead(planId: String) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+
+        let db = Firestore.firestore()
+
+        db.collection("plans")
+            .document(planId)
+            .collection("messages")
+            .getDocuments { snapshot, error in
+
+                guard let docs = snapshot?.documents else { return }
+
+                for doc in docs {
+                    doc.reference.updateData([
+                        "readUsers": FieldValue.arrayUnion([uid])
+                    ])
+                }
+            }
     }
 }

@@ -200,9 +200,9 @@ struct ChatView: View {
                     Text("データなし")
                 }
             case 6:
-
+                
                 if let selectedQuestion {
-                    AnswerView(question: selectedQuestion)
+                    AnswerView(question: selectedQuestion,plan:plan)
                 } else {
                     Text("データなし")
                 }
@@ -210,9 +210,11 @@ struct ChatView: View {
                 EmptyView()
             }
         }
+        
         .onAppear {
             chatviewModel.context = context
             chatviewModel.start(planId: plan.id)
+            chatviewModel.markAllAsRead(planId: plan.id)
         }
         .onDisappear {
             chatviewModel.stop()
@@ -311,20 +313,20 @@ struct ChatView: View {
                     }
                 }
             }
-            Text(item.senderName)
-                .font(.custom("KiwiMaru-Regular", size: 11))
-                .foregroundColor(.gray)
+            HStack{
+                Text(item.senderName)
+                    .font(.custom("KiwiMaru-Regular", size: 11))
+                    .foregroundColor(.gray)
+                if item.type == .chat {
+                    let read = (item.readUsers?.count ?? 0) - 1
+                    if read > 0 {
+                        Text("既読 \(read)")
+                            .padding(.horizontal, 10)
+                            .font(.custom("KiwiMaru-Regular", size: 11))
+                            .foregroundColor(.gray)
+                    }
+                }
+            }
         }
     }
 }
-//#Preview {
-//    ChatView(
-//        plan: PlanItem(
-//            id: "test",
-//            title: "テストプラン",
-//            ownerId: "user",
-//            inviteFriends: []
-//        )
-//    )
-//    .environmentObject(TabBarState())
-//}@
