@@ -41,6 +41,7 @@
 		6F0F281A2FC8359B000D8591 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6F229BD32FC59E7100C0E879 /* GoogleService-Info.plist */; };
 		6F0F281B2FC8359F000D8591 /* localsearchAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BD42FC59E7100C0E879 /* localsearchAPI.swift */; };
 		6F0F281C2FC835A4000D8591 /* ShowMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BD52FC59E7100C0E879 /* ShowMapView.swift */; };
+		6F42B2D82FD51A99009C737C /* Answerresult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F42B2D72FD51A99009C737C /* Answerresult.swift */; };
 		6FD6E3112FC721A1009CE45F /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6FD6E3102FC721A1009CE45F /* FirebaseAuth */; };
 		6FD6E3132FC721A9009CE45F /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6FD6E3122FC721A9009CE45F /* FirebaseCore */; };
 		6FD6E3152FC721B0009CE45F /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6FD6E3142FC721B0009CE45F /* FirebaseDatabase */; };
@@ -83,6 +84,7 @@
 		6F229BD32FC59E7100C0E879 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6F229BD42FC59E7100C0E879 /* localsearchAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = localsearchAPI.swift; sourceTree = "<group>"; };
 		6F229BD52FC59E7100C0E879 /* ShowMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMapView.swift; sourceTree = "<group>"; };
+		6F42B2D72FD51A99009C737C /* Answerresult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Answerresult.swift; sourceTree = "<group>"; };
 		6F7A1A212F6AA04700CFAF85 /* Asobean.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asobean.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -138,6 +140,7 @@
 				6F229BBA2FC59E7100C0E879 /* MainView */,
 				6F229BBB2FC59E7100C0E879 /* AddPlanView.swift */,
 				6F229BBC2FC59E7100C0E879 /* AddTimeView.swift */,
+				6F42B2D72FD51A99009C737C /* Answerresult.swift */,
 				6F229BBD2FC59E7100C0E879 /* AnswerView.swift */,
 				6F229BBE2FC59E7100C0E879 /* CollectPlanData.swift */,
 				6F229BBF2FC59E7100C0E879 /* FinPlanView.swift */,
@@ -300,6 +303,7 @@
 				6F0F27FB2FC834E8000D8591 /* ContentView.swift in Sources */,
 				6F0F28112FC83575000D8591 /* RootView.swift in Sources */,
 				6F0F28082FC8354F000D8591 /* FinPlanView.swift in Sources */,
+				6F42B2D82FD51A99009C737C /* Answerresult.swift in Sources */,
 				6F0F27FC2FC834FF000D8591 /* ChatView.swift in Sources */,
 				6F0F28042FC83534000D8591 /* AddPlanView.swift in Sources */,
 				6F0F280F2FC8356B000D8591 /* PlusButtonView.swift in Sources */,

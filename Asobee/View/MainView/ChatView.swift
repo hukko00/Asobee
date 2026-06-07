@@ -317,6 +317,9 @@ struct ChatView: View {
                 Text(item.senderName)
                     .font(.custom("KiwiMaru-Regular", size: 11))
                     .foregroundColor(.gray)
+                Text(chatviewModel.formatTime(item.createdAt))
+                    .font(.custom("KiwiMaru-Regular", size: 11))
+                    .foregroundColor(.gray)
                 if item.type == .chat {
                     let read = (item.readUsers?.count ?? 0) - 1
                     if read > 0 {

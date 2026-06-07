@@ -12,7 +12,7 @@ struct AnswerView: View {
 
     @State private var selectedIndex: Int?
     @State private var hasAnswered = false
-
+    @State private var showResult = false
     var body: some View {
 
         ZStack {
@@ -25,7 +25,6 @@ struct AnswerView: View {
             .ignoresSafeArea()
 
             VStack(spacing: 20) {
-
                 ZStack {
 
                     Text(question.title)
@@ -52,13 +51,24 @@ struct AnswerView: View {
                     }
                 }
                 .padding(.horizontal, 20)
-
+                
                 if hasAnswered {
-
-                    Text("回答済みです")
-                        .font(.custom("KiwiMaru-Regular", size: 15))
-                        .foregroundStyle(.gray)
-
+                    Button{
+                        showResult = true
+                    } label:{
+                        Text("集計結果>")
+                            .font(.custom("KiwiMaru-Medium", size: 20))
+                            .foregroundColor(
+                                Color(
+                                    red: 255 / 255,
+                                    green: 162 / 255,
+                                    blue: 97 / 255
+                                )
+                            )
+                    }
+                    .navigationDestination(isPresented: $showResult) {
+                        Answerresult(question: question)
+                    }
                 }
 
                 ScrollView {

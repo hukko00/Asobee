@@ -52,7 +52,7 @@ struct QuestionItem: Identifiable {
     let id: String
     let title: String
     let choices: [String]
-    let answerCounts: [Int]
+    let answerCounts: [String:Int]
     let answeredUsers: [String]
     let createdAt: Date
     let senderId: String
@@ -252,7 +252,8 @@ class chatviewmodel:ObservableObject{
                         let timestamp = data["createdAt"] as? Timestamp
                     else { continue }
 
-                    let answerCounts = data["answerCounts"] as? [Int] ?? []
+                    let answerCounts =
+                        data["answerCounts"] as? [String:Int] ?? [:]
                     let answeredUsers = data["answeredUsers"] as? [String] ?? []
                     
                     results.append(
@@ -400,5 +401,12 @@ class chatviewmodel:ObservableObject{
                     ])
                 }
             }
+    }
+    func formatTime(_ date: Date) -> String {
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+
+        return formatter.string(from: date)
     }
 }
