@@ -8,66 +8,163 @@ struct AddPlanView: View {
     @State private var isNavigate = false
     @State private var errorMessage: String? = nil
     @State private var showError: Bool = false
+    @EnvironmentObject var tabBarState: TabBarState
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        NavigationStack {
+        
+        ZStack {
+            
+            Color(
+                red: 247 / 255,
+                green: 246 / 255,
+                blue: 242 / 255
+            )
+            .ignoresSafeArea()
+            
             VStack(spacing: 20) {
-                NavigationLink {
-                    SelectFriendsView(selectedFriends: $selectedFriendIds)
-                } label: {
+                
+                // ヘッダー
+                ZStack {
+                    
+                    Text("プラン作成")
+                        .font(.custom("KiwiMaru-Medium", size: 20))
+                    
                     HStack {
-                        Text("メンバーを選択")
+                        
+                        Button {
+                            dismiss()
+                        } label: {
+                            
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 22))
+                                .foregroundColor(
+                                    Color(
+                                        red: 255 / 255,
+                                        green: 162 / 255,
+                                        blue: 97 / 255
+                                    )
+                                )
+                        }
+                        
                         Spacer()
+                    }
+                }
+                .padding(.horizontal, 20)
+//                @
+                NavigationLink {
+                    
+                    SelectFriendsView(
+                        selectedFriends: $selectedFriendIds
+                    )
+                    
+                } label: {
+                    
+                    HStack {
+                        
+                        Text("メンバーを選択")
+                            .font(
+                                .custom(
+                                    "KiwiMaru-Regular",
+                                    size: 18
+                                )
+                            )
+                            .foregroundStyle(.black)
+                        
+                        Spacer()
+                        
                         Text("\(selectedFriendIds.count)人")
-                            .foregroundColor(.gray)
+                            .foregroundStyle(.gray)
+                        
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(.gray)
                     }
                     .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
+                    .background(.white)
+                    .cornerRadius(18)
                 }
                 
-                VStack(alignment: .leading) {
-                    Text("プランタイトル")
-                        .font(.caption)
-                        .foregroundColor(.gray)
+                VStack(alignment: .leading, spacing: 8) {
                     
-                    TextField("例：遊びに行く", text: $text)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
+                    Text("プランタイトル")
+                        .font(
+                            .custom(
+                                "KiwiMaru-Regular",
+                                size: 14
+                            )
+                        )
+                        .foregroundStyle(.gray)
+                    
+                    TextField(
+                        "例：遊びに行く",
+                        text: $text
+                    )
+                    .font(
+                        .custom(
+                            "KiwiMaru-Regular",
+                            size: 18
+                        )
+                    )
+                    .padding()
+                    .background(.white)
+                    .cornerRadius(18)
                 }
+                
                 Spacer()
+                
                 Button {
-                    createPlan(title: text, selectedFriendIds: selectedFriendIds) { error in
-                        if let error = error {
-                            errorMessage = error.localizedDescription
+                    
+                    createPlan(
+                        title: text,
+                        selectedFriendIds: selectedFriendIds
+                    ) { error in
+                        
+                        if let error {
+                            
+                            errorMessage =
+                            error.localizedDescription
+                            
                             showError = true
                         }
                     }
-                    isNavigate = true
                 } label: {
+                    
                     Text("プラン作成")
-                        .font(.headline)
-                        .foregroundColor(.white)
+                        .font(
+                            .custom(
+                                "KiwiMaru-Medium",
+                                size: 20
+                            )
+                        )
+                        .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(text.isEmpty ? Color.gray : Color.blue)
-                        .cornerRadius(12)
-                }
-                .alert("エラー", isPresented: $showError) {
-                    Button("OK", role: .cancel) {}
-                } message: {
-                    Text(errorMessage ?? "")
+                        .background(
+                            text.isEmpty
+                            ? Color.gray
+                            : Color(
+                                red: 255 / 255,
+                                green: 162 / 255,
+                                blue: 97 / 255
+                            )
+                        )
+                        .cornerRadius(18)
                 }
                 .disabled(text.isEmpty)
-                .navigationDestination(isPresented: $isNavigate) {
-                    PlanView()
-                }
-                
             }
             .padding()
-            .navigationTitle("プラン作成")
+        }
+        .onAppear {
+            tabBarState.isVisible = false
+        }
+        .navigationBarBackButtonHidden(true)
+        .alert("エラー", isPresented: $showError) {
+            
+            Button("OK", role: .cancel) {}
+            
+        } message: {
+            
+            Text(errorMessage ?? "")
         }
     }
     
@@ -92,7 +189,7 @@ struct AddPlanView: View {
         db.collection("plans").addDocument(data: planData) { error in
             if let error = error {
                 print("作成失敗: \(error)")
-                completion(error) 
+                completion(error)
             } else {
                 print("作成成功")
                 dismiss()

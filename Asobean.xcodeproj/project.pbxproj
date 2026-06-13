@@ -129,6 +129,7 @@
 				6F229BB62FC59E7100C0E879 /* ChatView.swift */,
 				6F229BB72FC59E7100C0E879 /* ContentView.swift */,
 				6F229BB82FC59E7100C0E879 /* PlanView.swift */,
+				6F229BC22FC59E7100C0E879 /* FriendView.swift */,
 				6F229BB92FC59E7100C0E879 /* ProfileView.swift */,
 			);
 			path = MainView;
@@ -146,7 +147,6 @@
 				6F229BBF2FC59E7100C0E879 /* FinPlanView.swift */,
 				6F229BC02FC59E7100C0E879 /* FirebaseLogin.swift */,
 				6F229BC12FC59E7100C0E879 /* FriendListView.swift */,
-				6F229BC22FC59E7100C0E879 /* FriendView.swift */,
 				6F229BC32FC59E7100C0E879 /* GatheringMapView.swift */,
 				6F229BC42FC59E7100C0E879 /* KeepPlanData.swift */,
 				6F229BC52FC59E7100C0E879 /* KeyboadState.swift */,

@@ -5,10 +5,10 @@ struct ContentView: View {
     @EnvironmentObject var tabBarState: TabBarState
     
     var body: some View {
-        VStack(spacing: 0) {
-            
+        ZStack(alignment: .bottom) {
+
             // メイン画面
-            ZStack {
+            Group {
                 switch viewNumber {
                 case 1:
                     NavigationStack { ProfileView() }
@@ -20,8 +20,7 @@ struct ContentView: View {
                     NavigationStack { PlanView() }
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            
+
             // タブバー
             if tabBarState.isVisible {
                 HStack {
@@ -29,12 +28,9 @@ struct ContentView: View {
                     tabButton(icon: "person.2", title: "フレンド", index: 3)
                     tabButton(icon: "person.fill", title: "プロフィール", index: 1)
                 }
-                .padding(.vertical, 6)
+                .padding(.top, 8)
+                .padding(.bottom, 20)
                 .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-                .padding(.horizontal)
-                .padding(.bottom, 8)
-                .shadow(radius: 5)
             }
         }
         .ignoresSafeArea(.keyboard)
@@ -64,7 +60,7 @@ struct ContentView: View {
     }
 }
 
-//#Preview {
-//    ContentView()
-//        .environmentObject(TabBarState())
-//}
+#Preview {
+    ContentView()
+        .environmentObject(TabBarState())
+}

@@ -1,19 +1,181 @@
 import SwiftUI
 import FirebaseAuth
 import Firebase
+
 struct ProfileView: View {
+    @State private var myCode = ""
+    @State private var myFriendCode=""
+    @State private var friendStatus=""
+    @State private var username = ""
+    @State private var followingCount = 0
     @EnvironmentObject var authVM: AuthViewModel
+
+    let mainColor = Color(
+        red: 121/255,
+        green: 144/255,
+        blue: 67/255
+    )
+
     var body: some View {
         NavigationStack {
-            VStack {
-                Button{
-                    authVM.signOut()
-                } label:{
-                    Text("ログアウト")
-                        .font(.custom("KiwiMaru-Regular",size: 25))
+            ScrollView {
+                VStack(spacing: 20) {
+                    // タイトル
+                    HStack {
+                        Text("プロフィール")
+                            .font(.custom("KiwiMaru-Regular", size: 32))
+                        Spacer()
+                    }
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .frame(width: 100, height: 100)
+                        .foregroundColor(mainColor)
+                    Text(username)
+                        .font(.custom("KiwiMaru-Regular", size: 28))
+                    Text("みんなで遊ぶのが好き！")
+                        .font(.custom("KiwiMaru-Regular", size: 16))
+                        .foregroundColor(.gray)
+                    VStack(spacing: 12) {
+                        InfoRow(
+                            title: "フレンドコード",
+                            value: myCode
+                        )
+                        InfoRow(
+                            title: "フォロー",
+                            value: "\(followingCount)"
+                        )
+                    }
+                    
+                    Button {
+                        
+                    } label: {
+                        Text("プロフィール編集")
+                            .font(.custom("KiwiMaru-Regular", size: 20))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(mainColor)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    
+                    Button {
+                        authVM.signOut()
+                    } label: {
+                        Text("ログアウト")
+                            .font(.custom("KiwiMaru-Regular", size: 20))
+                            .foregroundColor(.red)
+                    }
+                }
+                .padding()
+            }
+            .onAppear {
+                fetchUsername { name in
+                    self.username = name
                 }
             }
+            .onAppear {
+                fetchFollowingCount { count in
+                    followingCount = count
+                }
+            }
+            .onAppear {
+                getMyFriendCode { code in
+                    if let code = code {
+                        myCode = code
+                        myFriendCode = code
+                    }
+                }
+                friendStatus = ""
+            }
+            .navigationBarHidden(true)
         }
+    }
+    func getMyFriendCode(completion: @escaping (String?) -> Void) {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            print("uid取得失敗")
+            completion(nil)
+            return
+        }
+        
+        let db = Firestore.firestore()
+        
+        db.collection("users")
+            .document(uid)
+            .getDocument { snapshot, error in
+                
+                if let error = error {
+                    print("取得失敗: \(error)")
+                    completion(nil)
+                    return
+                }
+                
+                guard let data = snapshot?.data(),
+                      let code = data["friendCode"] as? String else {
+                    print("friendCodeが見つからない")
+                    completion(nil)
+                    return
+                }
+                
+                completion(code)
+            }
+    }
+    func fetchUsername(completion: @escaping (String) -> Void) {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            completion("ユーザー")
+            return
+        }
+
+        Firestore.firestore()
+            .collection("users")
+            .document(uid)
+            .getDocument { snapshot, error in
+                if let data = snapshot?.data() {
+                    let username = data["userName"] as? String ?? "ユーザー"
+                    completion(username)
+                } else {
+                    completion("ユーザー")
+                }
+            }
+    }
+    func fetchFollowingCount(completion: @escaping (Int) -> Void) {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            completion(0)
+            return
+        }
+
+        Firestore.firestore()
+            .collection("users")
+            .document(uid)
+            .getDocument { snapshot, error in
+
+                guard let data = snapshot?.data(),
+                      let following = data["following"] as? [String] else {
+                    completion(0)
+                    return
+                }
+
+                completion(following.count)
+            }
+    }
+}
+
+struct InfoRow: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.custom("KiwiMaru-Regular", size: 18))
+
+            Spacer()
+
+            Text(value)
+                .font(.custom("KiwiMaru-Regular", size: 18))
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 struct LoginVisionView: View {

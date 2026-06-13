@@ -11,12 +11,6 @@ struct PlusButtonView: View {
             } label: {
                 ButtonBuilder(text: "アンケート", image: "questionmark.message")
             }
-            
-            Button {
-                onSelect(2)
-            } label: {
-                ButtonBuilder(text: "日程調整", image: "calendar")
-            }
             Button {
                 onSelect(4)
             } label: {

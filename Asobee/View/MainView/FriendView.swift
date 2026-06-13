@@ -37,15 +37,23 @@ struct FriendView: View {
                         Text("あなたのフレンドコード")
                             .font(.custom("KiwiMaru-Medium", size: 16))
                             .foregroundStyle(.gray)
-                        
-                        Text(myCode)
-                            .font(.custom("KiwiMaru-Medium", size: 26))
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 10)
-                            .background(
-                                RoundedRectangle(cornerRadius: 14)
-                                    .fill(Color.green.opacity(0.1))
-                            )
+                        HStack{
+                            Text(myCode)
+                                .font(.custom("KiwiMaru-Medium", size: 26))
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 10)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .fill(Color.green.opacity(0.1))
+                                )
+                            Button{
+                                UIPasteboard.general.string = myCode
+                            } label:{
+                                Image(systemName:"doc.on.doc")
+                                    .font(.custom("KiwiMaru-Medium", size: 26))
+                                    .foregroundStyle(.black)
+                            }
+                        }
                     }
                     .padding(.top)
                     

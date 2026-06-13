@@ -125,19 +125,17 @@ struct ChatView: View {
                 }
                 HStack(spacing: 10) {
                     Button {
-                        withAnimation(.easeInOut(duration: 0.25)) {
-                            showPlusMenu.toggle()
-                        }
+                       navigationNumber=1
                     } label:{
-                        Image(systemName: showPlusMenu ? "xmark":"plus")
+                        Image(systemName: "questionmark.message")
                             .font(.system(size: 20))
                             .foregroundColor(colorcode(r: 127, g: 183, b: 126))
                     }
                     
                     Button{
-                        
+                        navigationNumber=4
                     } label:{
-                        Image(systemName: "photo")
+                        Image(systemName: "text.document")
                             .font(.system(size: 20))
                             .foregroundColor(colorcode(r: 127, g: 183, b: 126))
                     }
