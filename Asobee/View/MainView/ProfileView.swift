@@ -32,9 +32,6 @@ struct ProfileView: View {
                         .foregroundColor(mainColor)
                     Text(username)
                         .font(.custom("KiwiMaru-Regular", size: 28))
-                    Text("みんなで遊ぶのが好き！")
-                        .font(.custom("KiwiMaru-Regular", size: 16))
-                        .foregroundColor(.gray)
                     VStack(spacing: 12) {
                         InfoRow(
                             title: "フレンドコード",

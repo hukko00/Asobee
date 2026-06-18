@@ -515,22 +515,22 @@ extension FinPlanView {
             }
     }
 }
-//#Preview {
-//
-//    NavigationStack {
-//
-//        FinPlanView(
-//            latitude: 35.681236,
-//            longitude: 139.767125,
-//            plan: PlanItem(
-//                id: "preview-id",
-//                title: "テストプラン",
-//                ownerId: "user1",
-//                inviteFriends: [
-//                    "user2",
-//                    "user3"
-//                ]
-//            )
-//        )
-//    }
-//}
+#Preview {
+
+    NavigationStack {
+
+        FinPlanView(
+            latitude: 35.681236,
+            longitude: 139.767125,
+            plan: PlanItem(
+                id: "preview-id",
+                title: "テストプラン",
+                ownerId: "user1",
+                inviteFriends: [
+                    "user2",
+                    "user3"
+                ]
+            )
+        )
+    }
+}

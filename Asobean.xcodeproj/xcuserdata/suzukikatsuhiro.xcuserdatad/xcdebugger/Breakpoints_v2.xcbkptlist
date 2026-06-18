@@ -120,7 +120,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "2C037217-4BBC-4567-9260-F67DF1ABBD52"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Asobee/ViewModel/ChatViewModel.swift"
@@ -129,6 +129,22 @@
             startingLineNumber = "329"
             endingLineNumber = "329"
             landmarkName = "makeTimelineItems(chats:maps:questions:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "567E8D7E-9347-4A89-81AF-654ADC8DB202"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Asobee/ViewModel/ChatViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "342"
+            endingLineNumber = "342"
+            landmarkName = "createChat(chat:planId:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

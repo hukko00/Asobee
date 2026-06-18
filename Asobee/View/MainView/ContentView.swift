@@ -20,8 +20,6 @@ struct ContentView: View {
                     NavigationStack { PlanView() }
                 }
             }
-
-            // タブバー
             if tabBarState.isVisible {
                 HStack {
                     tabButton(icon: "airplane.up.forward", title: "プラン", index: 2)

@@ -30,7 +30,6 @@
 		6F0F280E2FC83568000D8591 /* KeyboadState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BC52FC59E7100C0E879 /* KeyboadState.swift */; };
 		6F0F280F2FC8356B000D8591 /* PlusButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BC62FC59E7100C0E879 /* PlusButtonView.swift */; };
 		6F0F28102FC83570000D8591 /* QuestionnaireView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BC72FC59E7100C0E879 /* QuestionnaireView.swift */; };
-		6F0F28112FC83575000D8591 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BC82FC59E7100C0E879 /* RootView.swift */; };
 		6F0F28122FC8357A000D8591 /* SelectFriendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BC92FC59E7100C0E879 /* SelectFriendsView.swift */; };
 		6F0F28132FC8357E000D8591 /* setupGitignore.command in Resources */ = {isa = PBXBuildFile; fileRef = 6F229BCA2FC59E7100C0E879 /* setupGitignore.command */; };
 		6F0F28152FC83586000D8591 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BCD2FC59E7100C0E879 /* ChatViewModel.swift */; };
@@ -42,6 +41,7 @@
 		6F0F281B2FC8359F000D8591 /* localsearchAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BD42FC59E7100C0E879 /* localsearchAPI.swift */; };
 		6F0F281C2FC835A4000D8591 /* ShowMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BD52FC59E7100C0E879 /* ShowMapView.swift */; };
 		6F42B2D82FD51A99009C737C /* Answerresult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F42B2D72FD51A99009C737C /* Answerresult.swift */; };
+		6F42B2DC2FE022DA009C737C /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 6F42B2DB2FE022DA009C737C /* FirebaseMessaging */; };
 		6FD6E3112FC721A1009CE45F /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6FD6E3102FC721A1009CE45F /* FirebaseAuth */; };
 		6FD6E3132FC721A9009CE45F /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6FD6E3122FC721A9009CE45F /* FirebaseCore */; };
 		6FD6E3152FC721B0009CE45F /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6FD6E3142FC721B0009CE45F /* FirebaseDatabase */; };
@@ -73,7 +73,6 @@
 		6F229BC52FC59E7100C0E879 /* KeyboadState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboadState.swift; sourceTree = "<group>"; };
 		6F229BC62FC59E7100C0E879 /* PlusButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlusButtonView.swift; sourceTree = "<group>"; };
 		6F229BC72FC59E7100C0E879 /* QuestionnaireView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionnaireView.swift; sourceTree = "<group>"; };
-		6F229BC82FC59E7100C0E879 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		6F229BC92FC59E7100C0E879 /* SelectFriendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectFriendsView.swift; sourceTree = "<group>"; };
 		6F229BCA2FC59E7100C0E879 /* setupGitignore.command */ = {isa = PBXFileReference; lastKnownFileType = text; path = setupGitignore.command; sourceTree = "<group>"; };
 		6F229BCD2FC59E7100C0E879 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
@@ -85,6 +84,7 @@
 		6F229BD42FC59E7100C0E879 /* localsearchAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = localsearchAPI.swift; sourceTree = "<group>"; };
 		6F229BD52FC59E7100C0E879 /* ShowMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMapView.swift; sourceTree = "<group>"; };
 		6F42B2D72FD51A99009C737C /* Answerresult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Answerresult.swift; sourceTree = "<group>"; };
+		6F42B2D92FE0218A009C737C /* Asobean.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Asobean.entitlements; sourceTree = "<group>"; };
 		6F7A1A212F6AA04700CFAF85 /* Asobean.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asobean.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -95,6 +95,7 @@
 			files = (
 				6FD6E3152FC721B0009CE45F /* FirebaseDatabase in Frameworks */,
 				6FD6E3172FC721BD009CE45F /* FirebaseFirestore in Frameworks */,
+				6F42B2DC2FE022DA009C737C /* FirebaseMessaging in Frameworks */,
 				6FD6E3132FC721A9009CE45F /* FirebaseCore in Frameworks */,
 				6FD6E3112FC721A1009CE45F /* FirebaseAuth in Frameworks */,
 			);
@@ -152,7 +153,6 @@
 				6F229BC52FC59E7100C0E879 /* KeyboadState.swift */,
 				6F229BC62FC59E7100C0E879 /* PlusButtonView.swift */,
 				6F229BC72FC59E7100C0E879 /* QuestionnaireView.swift */,
-				6F229BC82FC59E7100C0E879 /* RootView.swift */,
 				6F229BC92FC59E7100C0E879 /* SelectFriendsView.swift */,
 				6F229BCA2FC59E7100C0E879 /* setupGitignore.command */,
 			);
@@ -188,6 +188,7 @@
 		6F7A1A182F6AA04700CFAF85 = {
 			isa = PBXGroup;
 			children = (
+				6F42B2D92FE0218A009C737C /* Asobean.entitlements */,
 				6F0F281D2FC83735000D8591 /* Asobean-Info.plist */,
 				6F229BD62FC59E7100C0E879 /* Asobee */,
 				6F7A1A7E2F6E0BC600CFAF85 /* Frameworks */,
@@ -231,6 +232,7 @@
 				6FD6E3122FC721A9009CE45F /* FirebaseCore */,
 				6FD6E3142FC721B0009CE45F /* FirebaseDatabase */,
 				6FD6E3162FC721BD009CE45F /* FirebaseFirestore */,
+				6F42B2DB2FE022DA009C737C /* FirebaseMessaging */,
 			);
 			productName = Asobee;
 			productReference = 6F7A1A212F6AA04700CFAF85 /* Asobean.app */;
@@ -301,7 +303,6 @@
 				6F0F28102FC83570000D8591 /* QuestionnaireView.swift in Sources */,
 				6F0F28122FC8357A000D8591 /* SelectFriendsView.swift in Sources */,
 				6F0F27FB2FC834E8000D8591 /* ContentView.swift in Sources */,
-				6F0F28112FC83575000D8591 /* RootView.swift in Sources */,
 				6F0F28082FC8354F000D8591 /* FinPlanView.swift in Sources */,
 				6F42B2D82FD51A99009C737C /* Answerresult.swift in Sources */,
 				6F0F27FC2FC834FF000D8591 /* ChatView.swift in Sources */,
@@ -457,6 +458,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Asobean.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -475,8 +478,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.SuzukiMasa926.Asobean.Dev;
+				PRODUCT_BUNDLE_IDENTIFIER = app.Suzuki.Masa.Asobee;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -492,6 +496,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Asobean.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -510,8 +516,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.SuzukiMasa926.Asobean.Dev;
+				PRODUCT_BUNDLE_IDENTIFIER = app.Suzuki.Masa.Asobee;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -557,6 +564,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		6F42B2DB2FE022DA009C737C /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6FD6E30F2FC72188009CE45F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
 		6FD6E3102FC721A1009CE45F /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6FD6E30F2FC72188009CE45F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

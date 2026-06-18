@@ -9,7 +9,7 @@ class CachedChatMessage {
     var senderId: String
     var senderName: String
     var createdAt: Date
-
+//@
     init(
         id: String,
         text: String,
