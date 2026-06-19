@@ -2,7 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>API_KEY</key>
+	<key>LOCALMAP_API_KEY</key>
 	<string>$(LOCALMAP_API_KEY)</string>
 	<key>UIAppFonts</key>
 	<array>
@@ -10,6 +10,8 @@
 		<string>KiwiMaru-Medium.ttf</string>
 		<string>KiwiMaru-Regular.ttf</string>
 	</array>
+	<key>CFBundleIdentifier</key>
+	<string></string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
