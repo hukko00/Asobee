@@ -22,14 +22,16 @@ struct Geometry: Codable {
 struct PropertyData: Codable {
     let Image1: String?
 }
-class mapviewModel:ObservableObject{
+class gatheringmapviewModel:ObservableObject{
     @Published var showFinPlanView: Bool = false
     @Published var selectedLatitude = 0.0
     @Published var selectedLongitude = 0.0
     @Published var mapItems: [MapItem] = []
     @Published var MapStyle: MapStyle = .standard
     @Published var isShowChangeSheet = false
+    @Published var isShowSearchSheet = false
     @Published var mapnumber: Int = 0
+    @Published var searchnumber: Int = 0
     @Published var searchText: String = ""
     @Published var searchResults: [Feature] = []
 
@@ -153,7 +155,8 @@ class mapviewModel:ObservableObject{
                 self.mapItems = items
                 self.searchResults = decoded.Feature ?? []
             }
-
+            print("取得件数:", features.count)
+            print("MapItems:", items.count)
             print("API END")
 
         } catch {

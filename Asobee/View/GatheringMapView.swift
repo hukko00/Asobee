@@ -8,7 +8,7 @@ struct GatheringMapView: View {
     var plan: PlanItem
     
     @Environment(\.dismiss) var dismiss
-    @StateObject private var vm = mapviewModel()
+    @StateObject private var vm = gatheringmapviewModel()
     
     var body: some View {
         
@@ -33,6 +33,9 @@ struct GatheringMapView: View {
                         )
                     )
                 }
+            }
+            .onMapCameraChange { context in
+                vm.centerCoordinate = context.region.center
             }
             .mapStyle(vm.MapStyle)
             .clipShape(
@@ -197,9 +200,28 @@ struct GatheringMapView: View {
                             .padding(5)
                             .background(.blue)
                             .clipShape(RoundedRectangle(cornerRadius: 18))
-                            .padding(.leading, 55)
+                            .padding(.leading)
                     }
                     Spacer()
+                    
+                    Button {
+                        
+                        vm.isShowSearchSheet = true
+                        
+                    } label: {
+                        
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 24))
+                            .foregroundStyle(.black)
+                            .padding(18)
+                            .background(.white)
+                            .clipShape(Circle())
+                            .shadow(
+                                color: .black.opacity(0.1),
+                                radius: 8,
+                                y: 4
+                            )
+                    }
                     
                     Button {
                         
@@ -227,10 +249,18 @@ struct GatheringMapView: View {
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $vm.isShowChangeSheet) {
             
-            SheetView(
+            MapSheetView(
                 mapnumber: $vm.mapnumber,
                 mapStyle: $vm.MapStyle,
                 cameraPosition: $vm.cameraPosition
+            )
+            .presentationDetents([.height(210)])
+            .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $vm.isShowSearchSheet) {
+            
+            SearchSheetView(
+                searchnumber: $vm.searchnumber
             )
             .presentationDetents([.height(210)])
             .presentationDragIndicator(.visible)
@@ -244,54 +274,136 @@ struct GatheringMapView: View {
         }
     }
 }
-
-struct SheetView: View {
+struct MapSheetView: View {
     @Binding var mapnumber: Int
     @Binding var mapStyle: MapStyle
     @Binding var cameraPosition: MapCameraPosition
-    
+
     var body: some View {
-        HStack(spacing: 16) {
-            VStack(spacing:5){
-                Button{
+
+        VStack(alignment: .leading, spacing: 20) {
+
+            Text("地図スタイル")
+                .font(.custom("KiwiMaru-Medium", size: 22))
+
+            HStack(spacing: 16) {
+
+                StyleCard(
+                    title: "通常",
+                    isSelected: mapnumber == 0
+                ) {
+                    mapnumber = 0
                     mapStyle = .standard
-                } label:{
-                    Map(position: $cameraPosition)
-                        .frame(width: 100, height: 100)
-                        .cornerRadius(10)
-                        .clipped()
-                        .mapStyle(.standard)
-                        .allowsHitTesting(false)
                 }
-                Text("通常")
-                    .font(.custom("KiwiMaru-Light", size: 20))
-                    .foregroundStyle(Color.black)
-            }
-            
-            Button{
-                mapStyle = .hybrid
-            } label:{
-                VStack{
-                    Map(position: $cameraPosition)
-                        .frame(width: 100, height: 100)
-                        .cornerRadius(10)
-                        .clipped()
-                        .mapStyle(.hybrid)
-                        .allowsHitTesting(false)
-                    Text("航空写真")
-                        .font(.custom("KiwiMaru-Light", size: 20))
-                        .foregroundStyle(Color.black)
+
+                StyleCard(
+                    title: "航空写真",
+                    isSelected: mapnumber == 1
+                ) {
+                    mapnumber = 1
+                    mapStyle = .hybrid
                 }
             }
         }
         .padding()
-        .background(Color(
-            red: 248 / 255,
-            green: 244 / 255,
-            blue: 236 / 255
-        ))
+        .background(
+            Color(
+                red: 248 / 255,
+                green: 244 / 255,
+                blue: 236 / 255
+            )
+        )
     }
-    
+}
+struct SearchSheetView: View {
+    @Binding var searchnumber: Int
+
+    var body: some View {
+
+        VStack(alignment: .leading, spacing: 20) {
+
+            Text("検索モード")
+                .font(.custom("KiwiMaru-Medium", size: 22))
+
+            HStack(spacing: 16) {
+
+                StyleCard(
+                    title: "地名",
+                    isSelected: searchnumber == 0
+                ) {
+                    searchnumber = 0
+                }
+
+                StyleCard(
+                    title: "詳細",
+                    isSelected: searchnumber == 1
+                ) {
+                    searchnumber = 1
+                }
+            }
+        }
+        .padding()
+        .background(
+            Color(
+                red: 248 / 255,
+                green: 244 / 255,
+                blue: 236 / 255
+            )
+        )
+    }
+}
+struct StyleCard: View {
+
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+
+        Button(action: action) {
+
+            VStack(spacing: 10) {
+
+                Image(
+                    systemName: isSelected
+                    ? "checkmark.circle.fill"
+                    : "circle"
+                )
+                .font(.system(size: 26))
+                .foregroundStyle(
+                    isSelected ? .blue : .gray
+                )
+
+                Text(title)
+                    .font(
+                        .custom(
+                            "KiwiMaru-Regular",
+                            size: 18
+                        )
+                    )
+                    .foregroundStyle(.black)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 90)
+            .background(.white)
+            .clipShape(
+                RoundedRectangle(cornerRadius: 18)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(
+                        isSelected
+                        ? Color.blue
+                        : Color.clear,
+                        lineWidth: 2
+                    )
+            }
+            .shadow(
+                color: .black.opacity(0.05),
+                radius: 5
+            )
+        }
+    }
 }
 #Preview {
     GatheringMapView(

@@ -34,7 +34,7 @@
 		6F0F28132FC8357E000D8591 /* setupGitignore.command in Resources */ = {isa = PBXBuildFile; fileRef = 6F229BCA2FC59E7100C0E879 /* setupGitignore.command */; };
 		6F0F28152FC83586000D8591 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BCD2FC59E7100C0E879 /* ChatViewModel.swift */; };
 		6F0F28162FC8358A000D8591 /* ConfigAPI.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6F229BCE2FC59E7100C0E879 /* ConfigAPI.xcconfig */; };
-		6F0F28172FC8358E000D8591 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BCF2FC59E7100C0E879 /* MapViewModel.swift */; };
+		6F0F28172FC8358E000D8591 /* GatheringMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BCF2FC59E7100C0E879 /* GatheringMapViewModel.swift */; };
 		6F0F28182FC83593000D8591 /* PlanModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BD02FC59E7100C0E879 /* PlanModel.swift */; };
 		6F0F28192FC83597000D8591 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F229BD22FC59E7100C0E879 /* Assets.xcassets */; };
 		6F0F281A2FC8359B000D8591 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6F229BD32FC59E7100C0E879 /* GoogleService-Info.plist */; };
@@ -49,7 +49,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		6F0F281D2FC83735000D8591 /* Asobean-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Asobean-Info.plist"; sourceTree = "<group>"; };
+		6F0F281D2FC83735000D8591 /* Asobean-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Asobean-Info.plist"; sourceTree = "<group>"; };
 		6F229BAE2FC59E7100C0E879 /* KiwiMaru-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = text; path = "KiwiMaru-Light.ttf"; sourceTree = "<group>"; };
 		6F229BAF2FC59E7100C0E879 /* KiwiMaru-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = text; path = "KiwiMaru-Medium.ttf"; sourceTree = "<group>"; };
 		6F229BB02FC59E7100C0E879 /* KiwiMaru-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = text; path = "KiwiMaru-Regular.ttf"; sourceTree = "<group>"; };
@@ -77,7 +77,7 @@
 		6F229BCA2FC59E7100C0E879 /* setupGitignore.command */ = {isa = PBXFileReference; lastKnownFileType = text; path = setupGitignore.command; sourceTree = "<group>"; };
 		6F229BCD2FC59E7100C0E879 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
 		6F229BCE2FC59E7100C0E879 /* ConfigAPI.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigAPI.xcconfig; sourceTree = "<group>"; };
-		6F229BCF2FC59E7100C0E879 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
+		6F229BCF2FC59E7100C0E879 /* GatheringMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatheringMapViewModel.swift; sourceTree = "<group>"; };
 		6F229BD02FC59E7100C0E879 /* PlanModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanModel.swift; sourceTree = "<group>"; };
 		6F229BD22FC59E7100C0E879 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6F229BD32FC59E7100C0E879 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -164,7 +164,7 @@
 			children = (
 				6F229BCD2FC59E7100C0E879 /* ChatViewModel.swift */,
 				6F229BCE2FC59E7100C0E879 /* ConfigAPI.xcconfig */,
-				6F229BCF2FC59E7100C0E879 /* MapViewModel.swift */,
+				6F229BCF2FC59E7100C0E879 /* GatheringMapViewModel.swift */,
 				6F229BD02FC59E7100C0E879 /* PlanModel.swift */,
 			);
 			path = ViewModel;
@@ -310,7 +310,7 @@
 				6F0F280F2FC8356B000D8591 /* PlusButtonView.swift in Sources */,
 				6F0F281C2FC835A4000D8591 /* ShowMapView.swift in Sources */,
 				6F0F28072FC8354B000D8591 /* CollectPlanData.swift in Sources */,
-				6F0F28172FC8358E000D8591 /* MapViewModel.swift in Sources */,
+				6F0F28172FC8358E000D8591 /* GatheringMapViewModel.swift in Sources */,
 				6F0F280D2FC83563000D8591 /* KeepPlanData.swift in Sources */,
 				6F0F28012FC83521000D8591 /* ChatCashData.swift in Sources */,
 				6F0F28182FC83593000D8591 /* PlanModel.swift in Sources */,
@@ -332,6 +332,7 @@
 /* Begin XCBuildConfiguration section */
 		6F7A1A2A2F6AA04800CFAF85 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6F229BCE2FC59E7100C0E879 /* ConfigAPI.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -397,6 +398,7 @@
 		};
 		6F7A1A2B2F6AA04800CFAF85 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6F229BCE2FC59E7100C0E879 /* ConfigAPI.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -455,6 +457,7 @@
 		};
 		6F7A1A2D2F6AA04800CFAF85 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6F229BCE2FC59E7100C0E879 /* ConfigAPI.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -493,6 +496,7 @@
 		};
 		6F7A1A2E2F6AA04800CFAF85 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6F229BCE2FC59E7100C0E879 /* ConfigAPI.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

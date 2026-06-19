@@ -15,7 +15,6 @@ export const sendChatNotification = onDocumentCreated(
   async (event) => {
     console.log("🔥 Function started");
 
-    // ```
     const messageData = event.data?.data();
 
     if (!messageData) {
@@ -28,10 +27,8 @@ export const sendChatNotification = onDocumentCreated(
     const planId = event.params.planId;
 
     const senderId = messageData.senderId;
-    const senderName = messageData.senderName ?? "新着メッセージ";
+    const senderName = messageData.senderName ?? "ユーザー";
     const chat = messageData.chat ?? "";
-
-    console.log("📨 New message:", messageData);
 
     const planDoc = await db
       .collection("plans")
@@ -43,11 +40,9 @@ export const sendChatNotification = onDocumentCreated(
       return;
     }
 
+    const planTitle = planDoc.data()?.title ?? "Asobee";
     const ownerId = planDoc.data()?.ownerId;
     const inviteFriends = planDoc.data()?.inviteFriends ?? [];
-
-    console.log("👑 ownerId:", ownerId);
-    console.log("👥 inviteFriends:", inviteFriends);
 
     const targetUsers = [
       ownerId,
@@ -69,14 +64,12 @@ export const sendChatNotification = onDocumentCreated(
 
       const token = userDoc.data()?.fcmToken;
 
-      console.log(`👤 ${uid} token:`, token);
-
       if (token) {
         tokens.push(token);
       }
     }
 
-    console.log("📱 tokens count:", tokens.length);
+    console.log("📱 tokens:", tokens);
 
     if (tokens.length === 0) {
       console.log("❌ 通知先なし");
@@ -86,11 +79,13 @@ export const sendChatNotification = onDocumentCreated(
     const response = await getMessaging().sendEachForMulticast({
       tokens,
       notification: {
-        title: senderName,
-        body: chat,
+        title: planTitle,
+        body: `${senderName}: ${chat}`,
       },
       data: {
         planId: planId,
+        senderId: senderId,
+        senderName: senderName,
       },
       apns: {
         headers: {
@@ -104,19 +99,17 @@ export const sendChatNotification = onDocumentCreated(
       },
     });
 
-    console.log("✅ success:", response.successCount);
-    console.log("❌ failure:", response.failureCount);
+    console.log(
+      `✅ 成功:${response.successCount} 失敗:${response.failureCount}`
+    );
 
-    response.responses.forEach((result, index) => {
-      if (!result.success) {
+    response.responses.forEach((r, i) => {
+      if (!r.success) {
         console.log(
-          `❌ token error ${index}:`,
-          result.error
+          `❌ token[${i}] error:`,
+          r.error
         );
       }
     });
-
-    console.log(`🎉 ${tokens.length}人へ通知送信完了`);
-    // ```
   }
 );

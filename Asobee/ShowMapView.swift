@@ -45,7 +45,7 @@ struct ShowMapView: View {
             }
         }
         .sheet(isPresented: $isShowChangeSheet){
-            SheetView(
+            MapSheetView(
                 mapnumber: $mapnumber,
                 mapStyle: $mapStyle,
                 cameraPosition: $cameraPosition

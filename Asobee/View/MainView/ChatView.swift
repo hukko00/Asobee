@@ -4,7 +4,7 @@ import FirebaseAuth
 import SwiftData
 struct ChatView: View {
     var plan: PlanItem
-    @StateObject private var vm = mapviewModel()
+    @StateObject private var vm = gatheringmapviewModel()
     @State private var listener: ListenerRegistration?
     @State var text: String = ""
     @Environment(\.modelContext) var context
