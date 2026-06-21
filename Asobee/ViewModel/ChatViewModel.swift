@@ -31,7 +31,7 @@ struct MapItem: Identifiable {
 enum ItemType {
     case chat
     case map
-    case question   // ←追加
+    case question   
 }
 
 struct TimelineItem: Identifiable {
@@ -64,6 +64,11 @@ class chatviewmodel:ObservableObject{
     @Published var times: [TimeItem] = []
     @Published var maps: [MapItem] = []
     @Published var questions: [QuestionItem] = []
+    @Published var isLoading = false
+    @Published var hasMoreChats = true
+    private var lastDocument: DocumentSnapshot?
+    private let pageSize = 15
+    private let loadSize = 10
     private var listeners: [ListenerRegistration] = []
     var context: ModelContext?
     func listenTimes(planId: String) {
@@ -117,23 +122,62 @@ class chatviewmodel:ObservableObject{
         
         listeners.append(listener)
     }
-    func listenChats(planId: String) {
-
-        guard let context = context else { return }
+    func loadChatsFromCache(planId: String) {
+        
+        guard let context else { return }
+        
+        do {
+            let descriptor = FetchDescriptor<CachedChat>(
+                predicate: #Predicate {
+                    $0.planId == planId
+                },
+                sortBy: [
+                    SortDescriptor(\.createdAt)
+                ]
+            )
+            
+            let cachedChats = try context.fetch(descriptor)
+            
+            self.chats = cachedChats.map {
+                ChatItem(
+                    id: $0.id,
+                    chat: $0.chat,
+                    createdAt: $0.createdAt,
+                    senderId: $0.senderId,
+                    senderName: $0.senderName,
+                    readUsers: []
+                )
+            }
+            
+            print("キャッシュ読込: \(cachedChats.count)件")
+            
+        } catch {
+            print("キャッシュ読込失敗: \(error)")
+        }
+    }
+    func loadFirstChats(planId: String) {
 
         let db = Firestore.firestore()
 
-        let listener = db.collection("plans")
+        db.collection("plans")
             .document(planId)
             .collection("messages")
-            .order(by: "createdAt")
-            .addSnapshotListener { [weak self] snapshot, error in
+            .order(by: "createdAt", descending: true)
+            .limit(to: 15)
+            .getDocuments { [weak self] snapshot, error in
 
-                guard let documents = snapshot?.documents else { return }
+                guard let self = self else { return }
 
-                var results: [ChatItem] = []
+                if let error = error {
+                    print("チャット取得失敗: \(error)")
+                    return
+                }
 
-                for doc in documents {
+                guard let docs = snapshot?.documents else { return }
+
+                self.lastDocument = docs.last
+
+                let messages: [ChatItem] = docs.compactMap { doc in
 
                     let data = doc.data()
 
@@ -143,89 +187,82 @@ class chatviewmodel:ObservableObject{
                         let senderId = data["senderId"] as? String,
                         let senderName = data["senderName"] as? String
                     else {
-                        continue
+                        return nil
                     }
-                    let readUsers = data["readUsers"] as? [String] ?? []
-                    let item = ChatItem(
+
+                    return ChatItem(
                         id: doc.documentID,
                         chat: chat,
                         createdAt: timestamp.dateValue(),
                         senderId: senderId,
                         senderName: senderName,
-                        readUsers: readUsers
+                        readUsers: data["readUsers"] as? [String] ?? []
                     )
-
-                    results.append(item)
-                    let docID = doc.documentID
-                    // 既存チェック
-                    let descriptor = FetchDescriptor<CachedChatMessage>(
-                        predicate: #Predicate {
-                            $0.id == docID
-                        }
-                    )
-
-                    let existing = try? context.fetch(descriptor)
-
-                    if existing?.isEmpty == true {
-
-                        let cached = CachedChatMessage(
-                            id: doc.documentID,
-                            text: chat,
-                            senderId: senderId,
-                            senderName: senderName,
-                            createdAt: timestamp.dateValue()
-                        )
-
-                        context.insert(cached)
-                    }
                 }
-
-                try? context.save()
 
                 DispatchQueue.main.async {
-                    self?.chats = results
+                    self.chats = messages
+                    // ここでSwiftDataへ保存
+                    self.saveChatsToCache(
+                        messages,
+                        planId: planId
+                    )
                 }
             }
-
-        listeners.append(listener)
     }
-    func listenMaps(planId: String) {
+    func loadMoreChats(planId: String) {
+        guard hasMoreChats else { return }
+        guard !isLoading else { return }
+        print("loadMoreChats")
+        isLoading = true
+        
+        guard let lastDocument else {
+            isLoading = false
+            return
+        }
+        
         let db = Firestore.firestore()
         
         db.collection("plans")
             .document(planId)
-            .collection("maps")
-            .order(by: "createdAt")
-            .getDocuments { snapshot, _ in
+            .collection("messages")
+            .order(by: "createdAt", descending: true)
+            .start(afterDocument: lastDocument)
+            .limit(to: loadSize)
+            .getDocuments { [weak self] snapshot, error in
                 
-                guard let snapshot = snapshot else { return }
+                guard let docs = snapshot?.documents else { return }
                 
-                var results: [MapItem] = []
+                self?.lastDocument = docs.last
                 
-                for doc in snapshot.documents {
+                let newChats = docs.compactMap { doc -> ChatItem? in
+                    
                     let data = doc.data()
                     
                     guard
-                        let lat = data["latitude"] as? Double,
-                        let lng = data["longitude"] as? Double,
+                        let chat = data["chat"] as? String,
+                        let timestamp = data["createdAt"] as? Timestamp,
                         let senderId = data["senderId"] as? String,
-                        let senderName = data["senderName"] as? String,
-                        let timestamp = data["createdAt"] as? Timestamp
-                    else { continue }
+                        let senderName = data["senderName"] as? String
+                    else { return nil }
                     
-                    results.append(
-                        MapItem(
-                            id: doc.documentID,
-                            lat: lat,
-                            lng: lng,
-                            createdAt: timestamp.dateValue(),
-                            senderId: senderId,
-                            senderName: senderName
-                        )
+                    return ChatItem(
+                        id: doc.documentID,
+                        chat: chat,
+                        createdAt: timestamp.dateValue(),
+                        senderId: senderId,
+                        senderName: senderName,
+                        readUsers: data["readUsers"] as? [String] ?? []
                     )
                 }
-                
-                self.maps = results
+                DispatchQueue.main.async {
+                    if docs.count < self?.loadSize ?? 0 {
+                        self?.hasMoreChats = false
+                    }
+                    let sortedChats = newChats.reversed()
+                    self?.chats.insert(contentsOf: sortedChats, at: 0)
+                    self?.isLoading = false
+                }
             }
     }
     func listenQuestions(planId: String) {
@@ -251,9 +288,9 @@ class chatviewmodel:ObservableObject{
                         let senderName = data["senderName"] as? String,
                         let timestamp = data["createdAt"] as? Timestamp
                     else { continue }
-
+                    
                     let answerCounts =
-                        data["answerCounts"] as? [String:Int] ?? [:]
+                    data["answerCounts"] as? [String:Int] ?? [:]
                     let answeredUsers = data["answeredUsers"] as? [String] ?? []
                     
                     results.append(
@@ -332,13 +369,13 @@ class chatviewmodel:ObservableObject{
     }
     func createChat(chat: String, planId: String) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
-
+        
         let db = Firestore.firestore()
-
+        
         db.collection("users").document(uid).getDocument { snapshot, _ in
-
+            
             let name = snapshot?.data()?["userName"] as? String ?? "不明"
-
+            
             db.collection("plans")
                 .document(planId)
                 .collection("messages")
@@ -367,9 +404,10 @@ class chatviewmodel:ObservableObject{
             }
     }
     func start(planId: String) {
+        loadChatsFromCache(planId: planId)
+        loadFirstChats(planId: planId)
         listenChats(planId: planId)
         listenTimes(planId: planId)
-        listenMaps(planId: planId)
         listenQuestions(planId: planId)
     }
     func stop() {
@@ -380,21 +418,21 @@ class chatviewmodel:ObservableObject{
         guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let navigationController = scene.windows.first?.rootViewController as? UINavigationController
         else { return }
-
+        
         navigationController.interactivePopGestureRecognizer?.isEnabled = true
     }
     func markAllAsRead(planId: String) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
-
+        
         let db = Firestore.firestore()
-
+        
         db.collection("plans")
             .document(planId)
             .collection("messages")
             .getDocuments { snapshot, error in
-
+                
                 guard let docs = snapshot?.documents else { return }
-
+                
                 for doc in docs {
                     doc.reference.updateData([
                         "readUsers": FieldValue.arrayUnion([uid])
@@ -402,11 +440,173 @@ class chatviewmodel:ObservableObject{
                 }
             }
     }
-    func formatTime(_ date: Date) -> String {
+    func listenChats(planId: String) {
 
+        let db = Firestore.firestore()
+
+        let listener = db.collection("plans")
+            .document(planId)
+            .collection("messages")
+            .order(by: "createdAt")
+            .addSnapshotListener { [weak self] snapshot, error in
+
+                guard let self = self else { return }
+
+                if let error = error {
+                    print("チャット監視失敗: \(error)")
+                    return
+                }
+
+                guard let snapshot else { return }
+
+                for change in snapshot.documentChanges {
+
+                    guard change.type == .added else { continue }
+
+                    let data = change.document.data()
+
+                    guard
+                        let chat = data["chat"] as? String,
+                        let timestamp = data["createdAt"] as? Timestamp,
+                        let senderId = data["senderId"] as? String,
+                        let senderName = data["senderName"] as? String
+                    else {
+                        continue
+                    }
+
+                    let item = ChatItem(
+                        id: change.document.documentID,
+                        chat: chat,
+                        createdAt: timestamp.dateValue(),
+                        senderId: senderId,
+                        senderName: senderName,
+                        readUsers: data["readUsers"] as? [String] ?? []
+                    )
+
+                    // 重複防止
+                    if self.chats.contains(where: { $0.id == item.id }) {
+                        continue
+                    }
+
+                    DispatchQueue.main.async {
+
+                        self.chats.append(item)
+
+                        self.saveNewChat(
+                            item,
+                            planId: planId
+                        )
+                    }
+                }
+            }
+
+        listeners.append(listener)
+    }
+    func saveNewChat(
+        _ item: ChatItem,
+        planId: String
+    ) {
+
+        guard let context else { return }
+
+        do {
+            let chatId = item.id
+
+            let exists = try context.fetch(
+                FetchDescriptor<CachedChat>(
+                    predicate: #Predicate<CachedChat> {
+                        $0.id == chatId
+                    }
+                )
+            )
+
+            if !exists.isEmpty {
+                return
+            }
+
+            let chat = CachedChat(
+                id: item.id,
+                planId: planId,
+                chat: item.chat,
+                senderId: item.senderId,
+                senderName: item.senderName,
+                createdAt: item.createdAt
+            )
+
+            context.insert(chat)
+
+            let allChats = try context.fetch(
+                FetchDescriptor<CachedChat>(
+                    predicate: #Predicate {
+                        $0.planId == planId
+                    },
+                    sortBy: [
+                        SortDescriptor(
+                            \.createdAt,
+                            order: .reverse
+                        )
+                    ]
+                )
+            )
+
+            if allChats.count > 15 {
+
+                for oldChat in allChats.dropFirst(15) {
+                    context.delete(oldChat)
+                }
+            }
+
+            try context.save()
+
+        } catch {
+            print("キャッシュ更新失敗: \(error)")
+        }
+    }
+    func formatTime(_ date: Date) -> String {
+        
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
-
+        
         return formatter.string(from: date)
+    }
+    func saveChatsToCache(
+        _ chats: [ChatItem],
+        planId: String
+    ) {
+        
+        guard let context else { return }
+        
+        do {
+            let descriptor = FetchDescriptor<CachedChat>(
+                predicate: #Predicate {
+                    $0.planId == planId
+                }
+            )
+            
+            let oldChats = try context.fetch(descriptor)
+            
+            for chat in oldChats {
+                context.delete(chat)
+            }
+            
+            for item in chats {
+                
+                let cachedChat = CachedChat(
+                    id: item.id,
+                    planId: planId,
+                    chat: item.chat,
+                    senderId: item.senderId,
+                    senderName: item.senderName,
+                    createdAt: item.createdAt
+                )
+                
+                context.insert(cachedChat)
+            }
+            
+            try context.save()
+            
+        } catch {
+            print("キャッシュ保存失敗: \(error)")
+        }
     }
 }

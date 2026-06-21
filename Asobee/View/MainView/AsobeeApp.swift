@@ -166,14 +166,14 @@ struct AsobeeApp: App {
                 ContentView()
                     .environmentObject(authVM)
                     .environmentObject(tabBarState)
-                    .modelContainer(for: CachedChatMessage.self)
+                    .modelContainer(for: CachedChat.self)
                 
             } else {
                 
                 LoginVisionView()
                     .environmentObject(authVM)
                     .environmentObject(tabBarState)
-                    .modelContainer(for: CachedChatMessage.self)
+                    .modelContainer(for: CachedChat.self)
             }
         }
     }

@@ -14,7 +14,6 @@
 		6F0F27FE2FC83513000D8591 /* KiwiMaru-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6F229BAF2FC59E7100C0E879 /* KiwiMaru-Medium.ttf */; };
 		6F0F27FF2FC83517000D8591 /* KiwiMaru-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6F229BB02FC59E7100C0E879 /* KiwiMaru-Regular.ttf */; };
 		6F0F28002FC8351C000D8591 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6F229BB12FC59E7100C0E879 /* OFL.txt */; };
-		6F0F28012FC83521000D8591 /* ChatCashData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BB32FC59E7100C0E879 /* ChatCashData.swift */; };
 		6F0F28022FC83529000D8591 /* PlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BB82FC59E7100C0E879 /* PlanView.swift */; };
 		6F0F28032FC8352E000D8591 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BB92FC59E7100C0E879 /* ProfileView.swift */; };
 		6F0F28042FC83534000D8591 /* AddPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BBB2FC59E7100C0E879 /* AddPlanView.swift */; };
@@ -42,6 +41,7 @@
 		6F0F281C2FC835A4000D8591 /* ShowMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F229BD52FC59E7100C0E879 /* ShowMapView.swift */; };
 		6F42B2D82FD51A99009C737C /* Answerresult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F42B2D72FD51A99009C737C /* Answerresult.swift */; };
 		6F42B2DC2FE022DA009C737C /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 6F42B2DB2FE022DA009C737C /* FirebaseMessaging */; };
+		6F84C94D2FE7A6AF00EB0CEE /* ChatDataCash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F84C94C2FE7A6AF00EB0CEE /* ChatDataCash.swift */; };
 		6FD6E3112FC721A1009CE45F /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6FD6E3102FC721A1009CE45F /* FirebaseAuth */; };
 		6FD6E3132FC721A9009CE45F /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6FD6E3122FC721A9009CE45F /* FirebaseCore */; };
 		6FD6E3152FC721B0009CE45F /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6FD6E3142FC721B0009CE45F /* FirebaseDatabase */; };
@@ -54,7 +54,6 @@
 		6F229BAF2FC59E7100C0E879 /* KiwiMaru-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = text; path = "KiwiMaru-Medium.ttf"; sourceTree = "<group>"; };
 		6F229BB02FC59E7100C0E879 /* KiwiMaru-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = text; path = "KiwiMaru-Regular.ttf"; sourceTree = "<group>"; };
 		6F229BB12FC59E7100C0E879 /* OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
-		6F229BB32FC59E7100C0E879 /* ChatCashData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCashData.swift; sourceTree = "<group>"; };
 		6F229BB52FC59E7100C0E879 /* AsobeeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsobeeApp.swift; sourceTree = "<group>"; };
 		6F229BB62FC59E7100C0E879 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		6F229BB72FC59E7100C0E879 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -86,6 +85,7 @@
 		6F42B2D72FD51A99009C737C /* Answerresult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Answerresult.swift; sourceTree = "<group>"; };
 		6F42B2D92FE0218A009C737C /* Asobean.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Asobean.entitlements; sourceTree = "<group>"; };
 		6F7A1A212F6AA04700CFAF85 /* Asobean.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asobean.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F84C94C2FE7A6AF00EB0CEE /* ChatDataCash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDataCash.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,7 +118,7 @@
 		6F229BB42FC59E7100C0E879 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				6F229BB32FC59E7100C0E879 /* ChatCashData.swift */,
+				6F84C94C2FE7A6AF00EB0CEE /* ChatDataCash.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -312,8 +312,8 @@
 				6F0F28072FC8354B000D8591 /* CollectPlanData.swift in Sources */,
 				6F0F28172FC8358E000D8591 /* GatheringMapViewModel.swift in Sources */,
 				6F0F280D2FC83563000D8591 /* KeepPlanData.swift in Sources */,
-				6F0F28012FC83521000D8591 /* ChatCashData.swift in Sources */,
 				6F0F28182FC83593000D8591 /* PlanModel.swift in Sources */,
+				6F84C94D2FE7A6AF00EB0CEE /* ChatDataCash.swift in Sources */,
 				6F0F27FA2FC72410000D8591 /* AsobeeApp.swift in Sources */,
 				6F0F280E2FC83568000D8591 /* KeyboadState.swift in Sources */,
 				6F0F28062FC8353F000D8591 /* AnswerView.swift in Sources */,

@@ -1,24 +1,28 @@
 import SwiftData
+import SwiftUI
 import Foundation
 
 @Model
-class CachedChatMessage {
+final class CachedChat {
 
     var id: String
-    var text: String
+    var planId: String
+    var chat: String
     var senderId: String
     var senderName: String
     var createdAt: Date
-//@
+
     init(
         id: String,
-        text: String,
+        planId: String,
+        chat: String,
         senderId: String,
         senderName: String,
         createdAt: Date
     ) {
         self.id = id
-        self.text = text
+        self.planId = planId
+        self.chat = chat
         self.senderId = senderId
         self.senderName = senderName
         self.createdAt = createdAt

@@ -34,6 +34,7 @@ struct GatheringMapView: View {
                     )
                 }
             }
+            .ignoresSafeArea()
             .onMapCameraChange { context in
                 vm.centerCoordinate = context.region.center
             }
@@ -124,19 +125,20 @@ struct GatheringMapView: View {
                     }
                     
                     Button {
-                        
-                        let lat =
-                        vm.centerCoordinate.latitude
-                        
-                        let lon =
-                        vm.centerCoordinate.longitude
-                        
-                        Task {
-                            await vm.fetchLocalSearch(
-                                query: vm.searchText,
-                                latitude: lat,
-                                longitude: lon
-                            )
+                        if vm.searchnumber == 1{
+                            let lat =
+                            vm.centerCoordinate.latitude
+                            
+                            let lon =
+                            vm.centerCoordinate.longitude
+                            
+                            Task {
+                                await vm.fetchLocalSearch(
+                                    query: vm.searchText,
+                                    latitude: lat,
+                                    longitude: lon
+                                )
+                            }
                         }
                         
                     } label: {

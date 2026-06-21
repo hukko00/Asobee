@@ -16,6 +16,7 @@ struct ChatView: View {
     @State private var selectedMap: MapItem? = nil
     @State private var selectedQuestion: QuestionItem? = nil
     @StateObject var chatviewModel = chatviewmodel()
+    @State private var didInitialScroll = false
     
     var body: some View {
         ZStack {
@@ -66,6 +67,11 @@ struct ChatView: View {
                                     }
                                     .padding(.horizontal, 8)
                                     .id(item.id)
+                                    .onAppear {
+                                        if item.id == chatviewModel.chats.first?.id {
+                                            chatviewModel.loadMoreChats(planId: plan.id)
+                                        }
+                                    }
                                 }
                             }
                             .padding(.vertical, 10)
@@ -102,6 +108,18 @@ struct ChatView: View {
                     }
                     .onChange(of: chatviewModel.chats.count) {
                         showScrollButton = true
+                        guard !didInitialScroll else { return }
+                        let items = chatviewModel.makeTimelineItems(
+                            chats: chatviewModel.chats,
+                            maps: chatviewModel.maps,
+                            questions: chatviewModel.questions
+                        )
+                        if let last = items.last {
+                            DispatchQueue.main.async {
+                                proxy.scrollTo(last.id, anchor: .bottom)
+                                didInitialScroll = true
+                            }
+                        }
                     }
                 }
                 Spacer()
@@ -208,7 +226,9 @@ struct ChatView: View {
                 EmptyView()
             }
         }
-        
+        .onAppear {
+            chatviewModel.context = context
+        }
         .onAppear {
             chatviewModel.context = context
             chatviewModel.start(planId: plan.id)

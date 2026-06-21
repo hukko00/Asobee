@@ -163,5 +163,55 @@ class gatheringmapviewModel:ObservableObject{
             print("エラー:", error)
         }
     }
+    func searchPlace() {
+
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = searchText
+
+        let search = MKLocalSearch(request: request)
+
+        search.start { response, error in
+
+            guard let response = response else {
+                print(error?.localizedDescription ?? "")
+                return
+            }
+
+            let items = response.mapItems.compactMap { item -> MapItem? in
+
+                let location = item.location
+
+                return MapItem(
+                    id: UUID().uuidString,
+                    lat: location.coordinate.latitude,
+                    lng: location.coordinate.longitude,
+                    createdAt: Date(),
+                    senderId: "mapkit",
+                    senderName: item.name ?? "不明"
+                )
+            }
+
+            DispatchQueue.main.async {
+
+                self.mapItems = items
+
+                if let first = items.first {
+
+                    self.cameraPosition = .region(
+                        MKCoordinateRegion(
+                            center: CLLocationCoordinate2D(
+                                latitude: first.lat,
+                                longitude: first.lng
+                            ),
+                            span: MKCoordinateSpan(
+                                latitudeDelta: 0.01,
+                                longitudeDelta: 0.01
+                            )
+                        )
+                    )
+                }
+            }
+        }
+    }
 }
 
