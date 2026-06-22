@@ -31,7 +31,7 @@ struct MapItem: Identifiable {
 enum ItemType {
     case chat
     case map
-    case question   
+    case question
 }
 
 struct TimelineItem: Identifiable {

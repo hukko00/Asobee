@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import FirebaseAuth
 import Firebase
 
@@ -9,6 +10,7 @@ struct ProfileView: View {
     @State private var username = ""
     @State private var followingCount = 0
     @EnvironmentObject var authVM: AuthViewModel
+    @Environment(\.modelContext) private var context
 
     let mainColor = Color(
         red: 121/255,
@@ -312,7 +314,8 @@ struct LoginVisionView: View {
         
         return result
     }
+    
 }
-//#Preview {
-//    ProfileView()
-//}
+#Preview {
+    ProfileView()
+}
