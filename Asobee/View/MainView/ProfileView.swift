@@ -8,6 +8,7 @@ struct ProfileView: View {
     @State private var friendStatus=""
     @State private var username = ""
     @State private var followingCount = 0
+    @Environment(\.dismiss) var dismiss
     @EnvironmentObject var authVM: AuthViewModel
 
     let mainColor = Color(
@@ -17,19 +18,31 @@ struct ProfileView: View {
     )
 
     var body: some View {
-        NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
                     // タイトル
                     HStack {
                         Text("プロフィール")
-                            .font(.custom("KiwiMaru-Regular", size: 32))
+                            .font(.custom("KiwiMaru-Regular", size: 29))
+                            .padding(.trailing,30)
                         Spacer()
                     }
                     Image(systemName: "person.circle.fill")
                         .resizable()
                         .frame(width: 100, height: 100)
                         .foregroundColor(mainColor)
+                    NavigationLink {
+                        FriendView()
+                    } label: {
+                        HStack {
+                            Image(systemName: "person.fill")
+                                .font(.custom("KiwiMaru-Regular", size: 25))
+
+                            Text("フレンド")
+                                .font(.custom("KiwiMaru-Regular", size: 25))
+                        }
+                        .foregroundStyle(.gray)
+                    }
                     Text(username)
                         .font(.custom("KiwiMaru-Regular", size: 28))
                     VStack(spacing: 12) {
@@ -85,7 +98,6 @@ struct ProfileView: View {
                 friendStatus = ""
             }
             .navigationBarHidden(true)
-        }
     }
     func getMyFriendCode(completion: @escaping (String?) -> Void) {
         guard let uid = Auth.auth().currentUser?.uid else {
@@ -313,6 +325,6 @@ struct LoginVisionView: View {
         return result
     }
 }
-//#Preview {
-//    ProfileView()
-//}
+#Preview {
+    ProfileView()
+}

@@ -113,7 +113,7 @@ struct PlanView: View {
                             .shadow(radius: 6)
                     }
                     .padding(.trailing, 18)
-                    .padding(.bottom, 120)
+                    .padding(.bottom, 150)
                 }
             }
         }

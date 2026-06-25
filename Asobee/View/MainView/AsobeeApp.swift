@@ -152,6 +152,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 struct AsobeeApp: App {
     
     @StateObject private var tabBarState = TabBarState()
+    @StateObject private var chatBarState = ChatBarState()
     @StateObject var authVM = AuthViewModel()
     
     @UIApplicationDelegateAdaptor(AppDelegate.self)
@@ -166,6 +167,7 @@ struct AsobeeApp: App {
                 ContentView()
                     .environmentObject(authVM)
                     .environmentObject(tabBarState)
+                    .environmentObject(chatBarState)
                     .modelContainer(for: CachedChat.self)
                 
             } else {
@@ -173,9 +175,9 @@ struct AsobeeApp: App {
                 LoginVisionView()
                     .environmentObject(authVM)
                     .environmentObject(tabBarState)
+                    .environmentObject(chatBarState)
                     .modelContainer(for: CachedChat.self)
             }
         }
     }
-    
 }

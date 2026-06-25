@@ -37,3 +37,6 @@ class KeyboardObserver: ObservableObject {
 class TabBarState: ObservableObject {
     @Published var isVisible: Bool = true
 }
+class ChatBarState: ObservableObject {
+    @Published var isVisible: Bool = true
+}

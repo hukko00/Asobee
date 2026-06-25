@@ -10,7 +10,6 @@ struct Friend: Identifiable {
 
 struct FriendListView: View {
     @State private var friends: [Friend] = []
-
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             

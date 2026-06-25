@@ -7,105 +7,204 @@ struct FriendView: View {
     @State private var myFriendCode: String = ""
     @State private var myCode: String = ""
     @State private var friendStatus: String = ""
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
+
+        ZStack {
+            
+            colorcode(r: 247, g: 246, b: 242)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 20) {
                 
-                // カスタムヘッダー
+                // ヘッダー
                 HStack {
+
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 22))
+                            .foregroundStyle(
+                                colorcode(
+                                    r: 255,
+                                    g: 162,
+                                    b: 97
+                                )
+                            )
+                    }
+
                     Text("フレンド")
                         .font(.custom("KiwiMaru-Medium", size: 30))
-                    
+
                     Spacer()
-                    
-                    NavigationLink {
-                        FriendListView()
-                    } label: {
-                        Image(systemName: "list.bullet")
-                            .font(.title3)
-                            .foregroundStyle(Color.black)
+                }                .padding(.horizontal)
+                
+                // 自分のコード
+                VStack(spacing: 12) {
+
+                    Text("あなたのフレンドコード")
+                        .font(.custom("KiwiMaru-Medium", size: 16))
+                        .foregroundStyle(.gray)
+
+                    HStack(spacing: 12) {
+
+                        Text(myCode.isEmpty ? "取得中..." : myCode)
+                            .font(.custom("KiwiMaru-Medium", size: 26))
+                            .foregroundStyle(.black)
+
+                        Button {
+                            UIPasteboard.general.string = myCode
+                        } label: {
+                            Image(systemName: "doc.on.doc.fill")
+                                .font(.system(size: 22))
+                                .foregroundStyle(
+                                    colorcode(
+                                        r: 255,
+                                        g: 162,
+                                        b: 97
+                                    )
+                                )
+                        }
                     }
                 }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(.white)
+                .clipShape(
+                    RoundedRectangle(cornerRadius: 20)
+                )
+                .shadow(
+                    color: .black.opacity(0.05),
+                    radius: 8
+                )
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(.white)
+                .clipShape(
+                    RoundedRectangle(cornerRadius: 20)
+                )
+                .shadow(
+                    color: .black.opacity(0.05),
+                    radius: 8
+                )
                 .padding(.horizontal)
-                .padding(.top, 10)
-                .padding(.bottom, 8)
                 
-                VStack(spacing: 20) {
+                // フレンド追加
+                VStack(alignment: .leading, spacing: 16) {
                     
-                    VStack(spacing: 8) {
-                        Text("あなたのフレンドコード")
-                            .font(.custom("KiwiMaru-Medium", size: 16))
-                            .foregroundStyle(.gray)
-                        HStack{
-                            Text(myCode)
-                                .font(.custom("KiwiMaru-Medium", size: 26))
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 10)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 14)
-                                        .fill(Color.green.opacity(0.1))
-                                )
-                            Button{
-                                UIPasteboard.general.string = myCode
-                            } label:{
-                                Image(systemName:"doc.on.doc")
-                                    .font(.custom("KiwiMaru-Medium", size: 26))
-                                    .foregroundStyle(.black)
-                            }
-                        }
-                    }
-                    .padding(.top)
+                    Text("フレンド追加")
+                        .font(.custom("KiwiMaru-Medium", size: 20))
                     
-                    VStack(spacing: 12) {
-                        TextField("フレンドコードを入力してください", text: $inputCode)
-                            .font(.custom("KiwiMaru-Medium", size: 16))
-                            .padding()
-                            .background(
-                                RoundedRectangle(cornerRadius: 14)
-                                    .fill(Color(.systemGray6))
-                            )
-                        
-                        Button {
-                            getUserInfoFromFriendCode(friendCode: inputCode) { uid, name in
-                                if let uid = uid {
-                                    followUser(friendUid: uid)
-                                    friendStatus = "フレンド申請できました！"
-                                } else {
-                                    friendStatus = "コードが違います！入力されたコードを確認して下さい！"
-                                }
-                            }
-                        } label: {
-                            Text("フレンド申請")
-                                .font(.custom("KiwiMaru-Medium", size: 18))
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .fill(Color.blue)
-                                )
-                        }
-                    }
+                    TextField(
+                        "フレンドコードを入力",
+                        text: $inputCode
+                    )
+                    .font(.custom("KiwiMaru-Regular", size: 16))
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(Color.white)
+                        colorcode(r: 247, g: 246, b: 242)
                     )
-                    .padding(.horizontal)
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: 14)
+                    )
                     
-                    if !friendStatus.isEmpty {
-                        Text(friendStatus)
-                            .font(.custom("KiwiMaru-Medium", size: 15))
-                            .foregroundStyle(.red)
-                            .padding(.horizontal)
+                    Button {
+                        getUserInfoFromFriendCode(
+                            friendCode: inputCode
+                        ) { uid, name in
+                            
+                            if let uid {
+                                followUser(friendUid: uid)
+                                friendStatus = "フレンド申請できました！"
+                            } else {
+                                friendStatus = "コードが見つかりません"
+                            }
+                        }
+                    } label: {
+                        Text("フレンド申請")
+                            .font(.custom("KiwiMaru-Medium", size: 18))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                colorcode(
+                                    r: 255,
+                                    g: 162,
+                                    b: 97
+                                )
+                            )
+                            .clipShape(
+                                RoundedRectangle(
+                                    cornerRadius: 16
+                                )
+                            )
                     }
-                    
-                    Spacer()
                 }
+                .padding()
+                .background(.white)
+                .clipShape(
+                    RoundedRectangle(cornerRadius: 20)
+                )
+                .shadow(
+                    color: .black.opacity(0.05),
+                    radius: 8
+                )
+                .padding(.horizontal)
+                
+                // ステータス
+                if !friendStatus.isEmpty {
+                    
+                    Text(friendStatus)
+                        .font(
+                            .custom(
+                                "KiwiMaru-Medium",
+                                size: 14
+                            )
+                        )
+                        .foregroundStyle(.gray)
+                }
+                
+                // フレンド一覧
+                NavigationLink {
+                    FriendListView()
+                } label: {
+                    
+                    HStack {
+                        
+                        Image(systemName: "person.2.fill")
+                        
+                        Text("フレンド一覧")
+                            .font(
+                                .custom(
+                                    "KiwiMaru-Medium",
+                                    size: 18
+                                )
+                            )
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                    }
+                    .foregroundStyle(.black)
+                    .padding()
+                    .background(.white)
+                    .clipShape(
+                        RoundedRectangle(
+                            cornerRadius: 20
+                        )
+                    )
+                    .shadow(
+                        color: .black.opacity(0.05),
+                        radius: 8
+                    )
+                }
+                .padding(.horizontal)
+                
+                Spacer()
             }
-            .background(Color.white)
-            .toolbar(.hidden)
             .onAppear {
                 getMyFriendCode { code in
                     if let code = code {
@@ -113,9 +212,12 @@ struct FriendView: View {
                         myFriendCode = code
                     }
                 }
-                friendStatus = ""
             }
+            .padding(.top)
         }
+        .toolbar(.hidden)
+        }
+
     }
     
     func getUserInfoFromFriendCode(friendCode: String, completion: @escaping (String?, String?) -> Void) {
@@ -142,7 +244,13 @@ struct FriendView: View {
                 completion(uid, name)
             }
     }
-    
+    func colorcode(r:Int,g:Int,b:Int)-> Color {
+        Color(
+            red: Double(r)/255,
+            green: Double(g)/255,
+            blue: Double(b)/255
+        )
+    }
     func checkMutualFollow(otherUid: String, completion: @escaping (Bool) -> Void) {
         guard let myUid = Auth.auth().currentUser?.uid else {
             print("uid取得失敗")
@@ -276,6 +384,6 @@ struct FriendView: View {
         }
     }
 }
-//#Preview{
-//    FriendView()
-//}
+#Preview{
+    FriendView()
+}

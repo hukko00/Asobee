@@ -4,7 +4,6 @@ internal import Combine
 
 class PlanViewModel: ObservableObject {
     @Published var plans: [Plan] = []
-    
     private var db = Firestore.firestore()
     
     func fetchPlans() {
@@ -27,3 +26,4 @@ class PlanViewModel: ObservableObject {
             }
     }
 }
+
